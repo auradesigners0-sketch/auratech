@@ -130,6 +130,24 @@
         #mainNav.nav-scrolled .nav-cta-desktop:hover { background: #007D30; }
         #mainNav.nav-scrolled .mobile-toggle-btn svg { color: #374151; }
 
+        /* Content hidden until preloader finishes */
+        body.loading { overflow: hidden; }
+        body.loading #mainNav,
+        body.loading #mobileMenuOverlay,
+        body.loading .fixed.inset-0.pointer-events-none,
+        body.loading footer,
+        body.loading #backToTop { opacity: 0; visibility: hidden; transition: none; }
+        body.loading .hero-section { opacity: 0; }
+        body.content-ready #mainNav { opacity: 1; visibility: visible; transition: opacity 0.6s ease 0.1s, background 0.5s ease, border-color 0.5s ease, box-shadow 0.5s ease; }
+        body.content-ready #mobileMenuOverlay { opacity: 1; visibility: visible; }
+        body.content-ready .fixed.inset-0.pointer-events-none { opacity: 1; visibility: visible; transition: opacity 0.8s ease 0.2s; }
+        body.content-ready footer,
+        body.content-ready #backToTop { opacity: 1; visibility: visible; }
+        body.content-ready .hero-section { opacity: 1; transition: opacity 0.6s ease; }
+        /* Hero animations wait for content-ready */
+        .hero-anim { animation-play-state: paused; }
+        body.content-ready .hero-anim { animation-play-state: running; }
+
         /* Overflow prevention */
         *, *::before, *::after { max-width: 100vw; }
         html, body { overflow-x: hidden; width: 100%; }
@@ -172,7 +190,7 @@
         }
     </style>
 </head>
-<body class="text-gray-900 antialiased overflow-x-hidden">
+<body class="text-gray-900 antialiased overflow-x-hidden loading">
 
     <!-- Preloader -->
     <div id="preloader">
@@ -231,7 +249,7 @@
     </div>
 
     <!-- ===== HERO BANNER ===== -->
-    <section class="relative pt-16 sm:pt-20 min-h-screen min-h-[100dvh] sm:min-h-screen flex items-stretch sm:items-center justify-center overflow-hidden">
+    <section class="hero-section relative pt-16 sm:pt-20 min-h-screen min-h-[100dvh] sm:min-h-screen flex items-stretch sm:items-center justify-center overflow-hidden">
         <img src="image/services-hero.jpg" alt="Services" class="absolute inset-0 w-full h-full object-cover">
         <div class="absolute inset-0 bg-gradient-to-r from-black/75 via-black/55 to-black/30"></div>
         <div class="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent"></div>
@@ -754,7 +772,13 @@
                 document.querySelector('.preloader-ring-inner').classList.add('exit');
                 document.querySelector('.preloader-glow').classList.add('exit');
             }, 3200);
-            setTimeout(() => { document.getElementById('preloader').classList.add('hidden'); }, 4000);
+            // Hide preloader & reveal content
+            setTimeout(() => {
+                document.getElementById('preloader').classList.add('hidden');
+                document.body.classList.remove('loading');
+                document.body.classList.add('content-ready');
+                document.dispatchEvent(new Event('contentReady'));
+            }, 4000);
         });
 
         lucide.createIcons();
@@ -775,11 +799,16 @@
             });
         });
 
-        const revealElements = document.querySelectorAll('.reveal, .reveal-left, .reveal-right, .reveal-scale');
-        const revealObserver = new IntersectionObserver((entries) => {
-            entries.forEach(entry => { if (entry.isIntersecting) { entry.target.classList.add('visible'); revealObserver.unobserve(entry.target); } });
-        }, { threshold: 0.05, rootMargin: '0px 0px -20px 0px' });
-        revealElements.forEach(el => revealObserver.observe(el));
+        // Reveal on scroll — delayed until after preloader
+        function initRevealObserver() {
+            const revealElements = document.querySelectorAll('.reveal, .reveal-left, .reveal-right, .reveal-scale');
+            const revealObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => { if (entry.isIntersecting) { entry.target.classList.add('visible'); revealObserver.unobserve(entry.target); } });
+            }, { threshold: 0.05, rootMargin: '0px 0px -20px 0px' });
+            revealElements.forEach(el => revealObserver.observe(el));
+        }
+        if (document.body.classList.contains('content-ready')) { initRevealObserver(); }
+        else { document.addEventListener('contentReady', initRevealObserver); }
 
         const mobileToggle = document.getElementById('mobileToggle');
 

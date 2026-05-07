@@ -121,6 +121,30 @@
         .pulse-glow { animation: pulse-glow 3s ease-in-out infinite; }
         .hero-img-glow { position: absolute; inset: -30px; border-radius: 50%; background: radial-gradient(ellipse at center, rgba(0,150,57,0.08), transparent 70%); filter: blur(50px); z-index: 0; }
 
+        /* Content hidden until preloader finishes */
+        body.loading { overflow: hidden; }
+        body.loading #mainNav,
+        body.loading #mobileMenuOverlay,
+        body.loading .fixed.inset-0.pointer-events-none,
+        body.loading footer,
+        body.loading #backToTop { opacity: 0; visibility: hidden; transition: none; }
+        /* Hero section: hide content during preloader */
+        body.loading .hero-section { opacity: 0; }
+        /* Below-fold sections already handled by .reveal class */
+        body.content-ready #mainNav { opacity: 1; visibility: visible; transition: opacity 0.6s ease 0.1s, background 0.5s ease, border-color 0.5s ease, box-shadow 0.5s ease; }
+        body.content-ready #mobileMenuOverlay { opacity: 1; visibility: visible; }
+        body.content-ready .fixed.inset-0.pointer-events-none { opacity: 1; visibility: visible; transition: opacity 0.8s ease 0.2s; }
+        body.content-ready footer,
+        body.content-ready #backToTop { opacity: 1; visibility: visible; }
+        /* Hero section fade in */
+        body.content-ready .hero-section { opacity: 1; transition: opacity 0.6s ease; }
+        /* Hero animations wait for content-ready */
+        .hero-anim { animation-play-state: paused; }
+        body.content-ready .hero-anim { animation-play-state: running; }
+        .hero-img-anim, .hero-img-anim-mobile { animation-play-state: paused; }
+        body.content-ready .hero-img-anim,
+        body.content-ready .hero-img-anim-mobile { animation-play-state: running; }
+
         /* Overflow prevention */
         *, *::before, *::after { max-width: 100vw; }
         html, body { overflow-x: hidden; width: 100%; }
@@ -163,7 +187,7 @@
         #mobileMenuOverlay .mobile-nav-link:hover { color: #1a1a1a; }
     </style>
 </head>
-<body class="text-gray-900 antialiased overflow-x-hidden">
+<body class="text-gray-900 antialiased overflow-x-hidden loading">
 
     <!-- Preloader -->
     <div id="preloader">
@@ -225,7 +249,7 @@
     </div>
 
     <!-- ===== HERO SECTION ===== -->
-    <section id="home" class="relative pt-20 sm:pt-28 pb-0 sm:pb-20 lg:pt-40 lg:pb-28 min-h-screen min-h-[100dvh] sm:min-h-screen flex items-stretch sm:items-center overflow-hidden">
+    <section id="home" class="hero-section relative pt-20 sm:pt-28 pb-0 sm:pb-20 lg:pt-40 lg:pb-28 min-h-screen min-h-[100dvh] sm:min-h-screen flex items-stretch sm:items-center overflow-hidden">
         <!-- Hero Background -->
         <div class="absolute inset-0 z-0">
             <img src="image/hero-darktech.jpg" alt="" class="w-full h-full object-cover">
@@ -587,7 +611,13 @@
                 document.querySelector('.preloader-ring-inner').classList.add('exit');
                 document.querySelector('.preloader-glow').classList.add('exit');
             }, 3200);
-            setTimeout(() => { document.getElementById('preloader').classList.add('hidden'); }, 4000);
+            // Hide preloader & reveal content
+            setTimeout(() => {
+                document.getElementById('preloader').classList.add('hidden');
+                document.body.classList.remove('loading');
+                document.body.classList.add('content-ready');
+                document.dispatchEvent(new Event('contentReady'));
+            }, 4000);
         });
 
         lucide.createIcons();
@@ -626,26 +656,35 @@
             });
         });
 
-        // Reveal on scroll
-        const revealElements = document.querySelectorAll('.reveal, .reveal-left, .reveal-right, .reveal-scale');
-        const revealObserver = new IntersectionObserver((entries) => {
-            entries.forEach(entry => { if (entry.isIntersecting) { entry.target.classList.add('visible'); revealObserver.unobserve(entry.target); } });
-        }, { threshold: 0.05, rootMargin: '0px 0px -20px 0px' });
-        revealElements.forEach(el => revealObserver.observe(el));
+        // Reveal on scroll — delayed until after preloader
+        function initRevealObserver() {
+            const revealElements = document.querySelectorAll('.reveal, .reveal-left, .reveal-right, .reveal-scale');
+            const revealObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => { if (entry.isIntersecting) { entry.target.classList.add('visible'); revealObserver.unobserve(entry.target); } });
+            }, { threshold: 0.05, rootMargin: '0px 0px -20px 0px' });
+            revealElements.forEach(el => revealObserver.observe(el));
+        }
+        // Start observing after preloader finishes
+        if (document.body.classList.contains('content-ready')) { initRevealObserver(); }
+        else { document.addEventListener('contentReady', initRevealObserver); }
 
-        // Counter animation
-        const counterElements = document.querySelectorAll('[data-count]');
-        const counterObserver = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    const el = entry.target, target = parseInt(el.getAttribute('data-count')), suffix = el.textContent.replace('0','').trim();
-                    let current = 0; const step = Math.max(1, Math.ceil(target / 80));
-                    const timer = setInterval(() => { current += step; if (current >= target) { current = target; clearInterval(timer); } el.textContent = current + suffix; }, 30);
-                    counterObserver.unobserve(el);
-                }
-            });
-        }, { threshold: 0.5 });
-        counterElements.forEach(el => counterObserver.observe(el));
+        // Counter animation — delayed until after preloader
+        function initCounterObserver() {
+            const counterElements = document.querySelectorAll('[data-count]');
+            const counterObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const el = entry.target, target = parseInt(el.getAttribute('data-count')), suffix = el.textContent.replace('0','').trim();
+                        let current = 0; const step = Math.max(1, Math.ceil(target / 80));
+                        const timer = setInterval(() => { current += step; if (current >= target) { current = target; clearInterval(timer); } el.textContent = current + suffix; }, 30);
+                        counterObserver.unobserve(el);
+                    }
+                });
+            }, { threshold: 0.5 });
+            counterElements.forEach(el => counterObserver.observe(el));
+        }
+        if (document.body.classList.contains('content-ready')) { initCounterObserver(); }
+        else { document.addEventListener('contentReady', initCounterObserver); }
 
         // Mobile menu
         const mobileToggle = document.getElementById('mobileToggle');
