@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact — AURATECH | Let's Build Something Great</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        brand: ['Manrope', 'sans-serif'],
+                    },
+                    colors: {
+                        accent: '#009639',
+                        'accent-hover': '#007D30',
+                        'accent-light': '#00B344',
+                        surface: {
+                            1: '#FAFAFA', 2: '#F5F5F5', 3: '#EEEEEE',
+                            4: '#E8E8E8', 5: '#DDDDDD', 6: '#D4D4D4',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { background: #FAFAFA; font-family: 'Inter', sans-serif; color: #1a1a1a; }
+        .glass-card { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(20px); border: 1px solid rgba(0, 0, 0, 0.08); box-shadow: 0 2px 16px -4px rgba(0, 0, 0, 0.04); }
+        .glass-high { background: rgba(250, 250, 250, 0.95); backdrop-filter: blur(16px); border-bottom: 1px solid rgba(0, 0, 0, 0.06); box-shadow: 0 2px 12px -4px rgba(0, 0, 0, 0.05); }
+        .text-glow { text-shadow: 0 0 40px rgba(0,150,57,0.25); }
+        .accent-glow { box-shadow: 0 8px 32px -8px rgba(0,150,57,0.35); }
+
+        #preloader { position: fixed; inset: 0; z-index: 9999; background: #FAFAFA; display: flex; align-items: center; justify-content: center; transition: opacity 0.8s ease, visibility 0.8s ease; }
+        #preloader.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+        .preloader-logo-wrap { position: relative; display: flex; align-items: center; justify-content: center; }
+        .preloader-ring-outer { position: absolute; width: clamp(120px, 40vw, 180px); height: clamp(120px, 40vw, 180px); border-radius: 50%; border: 1.5px solid transparent; border-top-color: rgba(0,150,57,0.3); border-right-color: rgba(0,150,57,0.08); animation: ringRotate 2.5s cubic-bezier(0.4, 0, 0.2, 1) infinite; }
+        .preloader-ring-inner { position: absolute; width: clamp(100px, 33vw, 150px); height: clamp(100px, 33vw, 150px); border-radius: 50%; border: 1px solid transparent; border-bottom-color: rgba(0,150,57,0.2); border-left-color: rgba(0,150,57,0.05); animation: ringRotate 3.5s linear infinite reverse; }
+        @keyframes ringRotate { to { transform: rotate(360deg); } }
+        .preloader-glow { position: absolute; width: clamp(90px, 30vw, 140px); height: clamp(90px, 30vw, 140px); border-radius: 50%; background: radial-gradient(circle, rgba(0,150,57,0.12), transparent 70%); animation: glowBreath 2s ease-in-out infinite; }
+        @keyframes glowBreath { 0%, 100% { transform: scale(1); opacity: 0.5; } 50% { transform: scale(1.5); opacity: 1; } }
+        .preloader-logo { position: relative; z-index: 2; opacity: 0; transform: scale(0.4) rotate(-15deg); filter: blur(20px) brightness(0.5); animation: logoReveal 1.4s cubic-bezier(0.16, 1, 0.3, 1) 0.3s forwards; }
+        @keyframes logoReveal { 0% { opacity: 0; transform: scale(0.4) rotate(-15deg); filter: blur(20px) brightness(0.5); } 40% { opacity: 1; filter: blur(2px) brightness(1); } 70% { transform: scale(1.08) rotate(2deg); filter: blur(0) brightness(1); } 85% { transform: scale(0.97) rotate(-0.5deg); } 100% { opacity: 1; transform: scale(1) rotate(0deg); filter: blur(0) brightness(1); } }
+        .preloader-logo.landed { animation: logoReveal 1.4s cubic-bezier(0.16, 1, 0.3, 1) 0.3s forwards, logoFloat 3s ease-in-out 1.8s infinite; }
+        @keyframes logoFloat { 0%, 100% { transform: scale(1) rotate(0deg) translateY(0); } 50% { transform: scale(1) rotate(0deg) translateY(-6px); } }
+        .preloader-logo.exit { animation: logoExit 0.7s cubic-bezier(0.55, 0, 1, 0.45) forwards !important; }
+        @keyframes logoExit { 0% { opacity: 1; transform: scale(1) rotate(0deg); filter: blur(0); } 50% { opacity: 0.8; transform: scale(1.1) rotate(3deg); filter: blur(0); } 100% { opacity: 0; transform: scale(0.3) rotate(20deg); filter: blur(15px); } }
+        .preloader-ring-outer.exit, .preloader-ring-inner.exit, .preloader-glow.exit { animation: ringsExit 0.5s ease-out forwards !important; }
+        @keyframes ringsExit { to { opacity: 0; transform: scale(1.5); } }
+
+        .reveal { opacity: 0; transform: translateY(60px); transition: opacity 1.3s cubic-bezier(0.22, 1, 0.36, 1), transform 1.3s cubic-bezier(0.22, 1, 0.36, 1); }
+        .reveal.visible { opacity: 1; transform: translateY(0); }
+        .reveal-left { opacity: 0; transform: translateX(-100px); transition: opacity 1.3s cubic-bezier(0.22, 1, 0.36, 1), transform 1.3s cubic-bezier(0.22, 1, 0.36, 1); }
+        .reveal-left.visible { opacity: 1; transform: translateX(0); }
+        .reveal-right { opacity: 0; transform: translateX(100px); transition: opacity 1.3s cubic-bezier(0.22, 1, 0.36, 1), transform 1.3s cubic-bezier(0.22, 1, 0.36, 1); }
+        .reveal-right.visible { opacity: 1; transform: translateX(0); }
+        .reveal-scale { opacity: 0; transform: scale(0.75); transition: opacity 1.2s cubic-bezier(0.22, 1, 0.36, 1), transform 1.2s cubic-bezier(0.22, 1, 0.36, 1); }
+        .reveal-scale.visible { opacity: 1; transform: scale(1); }
+        .stagger-1 { transition-delay: 0.15s; }
+        .stagger-2 { transition-delay: 0.3s; }
+        .stagger-3 { transition-delay: 0.45s; }
+        .stagger-4 { transition-delay: 0.6s; }
+
+        @keyframes heroFadeUp { 0% { opacity: 0; transform: translateY(30px); } 100% { opacity: 1; transform: translateY(0); } }
+        .hero-anim { opacity: 0; animation: heroFadeUp 1.2s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
+        .hero-d1 { animation-delay: 0.3s; }
+        .hero-d2 { animation-delay: 0.5s; }
+        .hero-d3 { animation-delay: 0.7s; }
+
+        .gradient-border { position: relative; }
+        .gradient-border::before { content: ''; position: absolute; inset: 0; border-radius: inherit; padding: 1px; background: linear-gradient(135deg, rgba(0,150,57,0.25), transparent 60%); -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0); mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0); -webkit-mask-composite: xor; mask-composite: exclude; pointer-events: none; }
+
+        .nav-link { position: relative; color: #4b5563; }
+        .nav-link::after { content: ''; position: absolute; bottom: -4px; left: 0; width: 0; height: 2px; background: #009639; transition: width 0.3s ease; border-radius: 1px; }
+        .nav-link:hover::after { width: 100%; }
+        .nav-link.active { color: #1a1a1a !important; font-weight: 500; }
+        .nav-link.active::after { width: 100%; }
+
+        .img-card { position: relative; overflow: hidden; border-radius: 1rem; }
+        .img-card img { transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1); }
+        .img-card:hover img { transform: scale(1.05); }
+        .img-overlay { position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.15) 50%, transparent 100%); }
+        .img-overlay-strong { position: absolute; inset: 0; background: linear-gradient(to right, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.5) 50%, rgba(0,0,0,0.15) 100%); }
+
+        .form-input { background: rgba(0,0,0,0.03); border: 1px solid rgba(0,0,0,0.12); border-radius: 0.75rem; padding: 0.75rem 1rem; color: #1a1a1a; font-size: 0.875rem; transition: all 0.2s ease; width: 100%; outline: none; }
+        .form-input:focus { border-color: rgba(0,150,57,0.5); box-shadow: 0 0 0 3px rgba(0,150,57,0.08); background: rgba(0,0,0,0.02); }
+        .form-input::placeholder { color: #9CA3AF; }
+        .form-input.error { border-color: #EF4444; box-shadow: 0 0 0 3px rgba(239,68,68,0.08); }
+        .form-input.success { border-color: rgba(0,150,57,0.5); }
+        .form-label { display: block; font-size: 0.8125rem; font-weight: 500; color: #374151; margin-bottom: 0.5rem; }
+        .form-error { font-size: 0.75rem; color: #EF4444; margin-top: 0.375rem; display: none; }
+        .form-error.visible { display: block; }
+        .honeypot-field { position: absolute; left: -9999px; top: -9999px; opacity: 0; height: 0; width: 0; pointer-events: none; }
+        .security-badge { display: inline-flex; align-items: center; gap: 0.375rem; font-size: 0.6875rem; color: #6B7280; background: rgba(0,0,0,0.04); border: 1px solid rgba(0,0,0,0.08); border-radius: 9999px; padding: 0.25rem 0.625rem; }
+        @keyframes spin-slow { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        .spin-slow { animation: spin-slow 2s linear infinite; }
+        .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(100px); z-index: 100; transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s ease; opacity: 0; pointer-events: none; }
+        .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; pointer-events: auto; }
+
+        #mobileMenuOverlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 51; background: rgba(250, 250, 250, 0.98); backdrop-filter: blur(24px); border-bottom: 1px solid rgba(0,0,0,0.08); transform: translateY(-100%); opacity: 0; transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease; pointer-events: none; overflow-y: auto; }
+        #mobileMenuOverlay.open { transform: translateY(0); opacity: 1; pointer-events: auto; }
+        #mobileMenuOverlay .mobile-nav-link { display: flex; align-items: center; justify-content: center; gap: 0.75rem; padding: 1rem 0; font-size: 1.25rem; font-weight: 500; color: #4b5563; border-bottom: 1px solid rgba(0,0,0,0.06); transition: color 0.2s ease; }
+        #mobileMenuOverlay .mobile-nav-link:hover, #mobileMenuOverlay .mobile-nav-link:active { color: #1a1a1a; }
+        .mobile-menu-glow { position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); width: 300px; height: 150px; background: radial-gradient(ellipse, rgba(0,150,57,0.04), transparent 70%); filter: blur(40px); pointer-events: none; }
+
+        html { scroll-behavior: smooth; }
+    
+        /* Transparent nav (hero) */
+        #mainNav.nav-transparent { background: transparent; backdrop-filter: none; border-bottom: 1px solid transparent; box-shadow: none; }
+        #mainNav.nav-transparent .nav-link { color: rgba(255,255,255,0.8); }
+        #mainNav.nav-transparent .nav-link:hover { color: #fff; }
+        #mainNav.nav-transparent .nav-link.active { color: #fff !important; }
+        #mainNav.nav-transparent .nav-link::after { background: #00B344; }
+        #mainNav.nav-transparent .nav-link:hover::after { width: 100%; }
+        #mainNav.nav-transparent .nav-link.active::after { width: 100%; }
+        #mainNav.nav-transparent .nav-cta-desktop { background: rgba(0,150,57,0.85); backdrop-filter: blur(8px); border: 1px solid rgba(0,150,57,0.3); }
+        #mainNav.nav-transparent .nav-cta-desktop:hover { background: rgba(0,150,57,1); }
+        #mainNav.nav-transparent .mobile-toggle-btn { color: white; }
+        #mainNav.nav-transparent .mobile-toggle-btn svg { color: white; }
+
+        /* Scrolled nav (normal) */
+        #mainNav.nav-scrolled { background: rgba(250, 250, 250, 0.95); backdrop-filter: blur(16px); border-bottom: 1px solid rgba(0,0,0,0.06); box-shadow: 0 2px 12px -4px rgba(0,0,0,0.05); }
+        #mainNav.nav-scrolled .nav-link { color: #4b5563; }
+        #mainNav.nav-scrolled .nav-link:hover { color: #1a1a1a; }
+        #mainNav.nav-scrolled .nav-link.active { color: #1a1a1a !important; }
+        #mainNav.nav-scrolled .nav-link::after { background: #009639; }
+        #mainNav.nav-scrolled .nav-cta-desktop { background: #009639; border: none; }
+        #mainNav.nav-scrolled .nav-cta-desktop:hover { background: #007D30; }
+        #mainNav.nav-scrolled .mobile-toggle-btn svg { color: #374151; }
+
+        /* Overflow prevention */
+        *, *::before, *::after { max-width: 100vw; }
+        html, body { overflow-x: hidden; width: 100%; }
+
+        /* Responsive fixes for small devices */
+        @media (max-width: 640px) {
+            .hero-img-glow { inset: -15px; }
+            h1 { word-break: break-word; }
+            /* Buttons max 50% width on mobile */
+            .btn-mobile-half { max-width: 50%; }
+            .btn-mobile-half.w-full { width: auto; }
+            /* Image containers - prevent overflow */
+            .img-mobile-fix { overflow: hidden; }
+            .img-mobile-fix img { width: 100%; height: 100%; object-fit: cover; }
+            /* Collapsible cards on mobile */
+            .mobile-collapsible .card-body { max-height: 0; overflow: hidden; opacity: 0; transition: max-height 0.35s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.25s ease, padding 0.3s ease; padding-top: 0; padding-bottom: 0; }
+            .mobile-collapsible .card-toggle-icon { transition: transform 0.3s ease; }
+            .mobile-collapsible.open .card-body { max-height: 500px; opacity: 1; padding-top: 0.5rem; padding-bottom: 0; }
+            .mobile-collapsible.open .card-toggle-icon { transform: rotate(180deg); }
+            .mobile-collapsible { cursor: pointer; }
+            /* Fix image+text grid overlap on mobile */
+            .grid.lg\:grid-cols-2 { gap: 1.5rem; }
+            .grid.lg\:grid-cols-2 > div { min-width: 0; }
+
+            /* Contact image overlay - switch to bottom-to-top gradient on mobile */
+            .img-overlay-strong {
+                background: linear-gradient(to top, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.7) 35%, rgba(0,0,0,0.3) 65%, rgba(0,0,0,0.1) 100%) !important;
+            }
+            /* Security badges smaller on mobile */
+            .security-badge { font-size: 0.6rem; padding: 0.2rem 0.5rem; gap: 0.25rem; }
+            .security-badge svg, .security-badge i { width: 0.65rem !important; height: 0.65rem !important; }
+        }
+        @media (min-width: 641px) {
+            .mobile-collapsible .card-body { max-height: none !important; opacity: 1 !important; overflow: visible !important; }
+            .mobile-collapsible .card-toggle-icon { display: none; }
+            .mobile-collapsible { cursor: default; }
+        }
+    </style>
+</head>
+<body class="text-gray-900 antialiased overflow-x-hidden">
+
+    <!-- Preloader -->
+    <div id="preloader">
+        <div class="preloader-logo-wrap">
+            <div class="preloader-glow"></div>
+            <div class="preloader-ring-outer"></div>
+            <div class="preloader-ring-inner"></div>
+            <img src="image/logo.png" alt="AURATECH" class="preloader-logo h-16 sm:h-20 md:h-24 w-auto">
+        </div>
+    </div>
+
+    <!-- Background Decorative -->
+    <div class="fixed inset-0 pointer-events-none z-0">
+        <div class="absolute top-[-200px] left-[-100px] w-[800px] h-[500px] rounded-full opacity-[0.15]" style="background: radial-gradient(ellipse, #009639, transparent 70%); filter: blur(120px);"></div>
+        <div class="absolute bottom-[-300px] right-[-200px] w-[600px] h-[600px] rounded-full opacity-[0.10]" style="background: radial-gradient(ellipse, #009639, transparent 70%); filter: blur(100px);"></div>
+    </div>
+
+    <!-- Navigation -->
+    <nav id="mainNav" class="fixed top-0 left-0 right-0 z-50 h-16 nav-transparent transition-all duration-500">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 h-full flex items-center justify-between">
+            <a href="index.html" class="font-brand text-xl font-medium tracking-tighter flex items-center gap-3"><img src="image/logo.png" alt="AURATECH Logo" class="h-9 w-auto"></a>
+            <div class="hidden md:flex items-center gap-8">
+                <a href="index.html" class="nav-link text-sm hover:text-gray-900 transition-colors duration-200">Home</a>
+                <a href="about.html" class="nav-link text-sm hover:text-gray-900 transition-colors duration-200">About</a>
+                <a href="service.html" class="nav-link text-sm hover:text-gray-900 transition-colors duration-200">Services</a>
+                <a href="contact.html" class="nav-link text-sm hover:text-gray-900 transition-colors duration-200 active">Contact</a>
+            </div>
+            <div class="flex items-center gap-4">
+                <a href="contact.html" class="nav-cta-desktop hidden md:flex items-center gap-2 bg-accent hover:bg-accent-hover text-white text-sm font-medium px-5 py-2.5 rounded-lg transition-all duration-200 hover:scale-105 active:scale-95 accent-glow">Get Started <i data-lucide="arrow-right" class="w-4 h-4"></i></a>
+                <button id="mobileToggle" class="mobile-toggle-btn md:hidden p-2 rounded-lg hover:bg-black/5 transition-colors" aria-label="Toggle menu" aria-expanded="false">
+                    <i data-lucide="menu" class="w-5 h-5 text-gray-700" id="menuIconOpen"></i>
+                    <i data-lucide="x" class="w-5 h-5 hidden text-gray-700" id="menuIconClose"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Mobile Menu -->
+    <div id="mobileMenuOverlay" role="dialog" aria-label="Mobile navigation">
+        <div class="mobile-menu-glow"></div>
+        <div class="relative z-10 px-6 py-8 flex flex-col items-center text-center h-full">
+            <button id="mobileMenuClose" class="absolute top-4 right-4 p-2.5 rounded-xl bg-gray-100 hover:bg-gray-200 transition-colors z-20" aria-label="Close menu">
+                <i data-lucide="x" class="w-6 h-6 text-gray-700"></i>
+            </button>
+            <div class="mb-6 sm:mb-8 shrink-0"><img src="image/logo.png" alt="AURATECH Logo" class="h-10 sm:h-14 w-auto mx-auto"></div>
+            <div class="flex-1 flex flex-col justify-center w-full gap-1">
+                <a href="index.html" class="mobile-nav-link"><i data-lucide="home" class="w-5 h-5 text-gray-400"></i>Home</a>
+                <a href="about.html" class="mobile-nav-link"><i data-lucide="info" class="w-5 h-5 text-gray-400"></i>About</a>
+                <a href="service.html" class="mobile-nav-link"><i data-lucide="layers" class="w-5 h-5 text-gray-400"></i>Services</a>
+                <a href="contact.html" class="mobile-nav-link"><i data-lucide="mail" class="w-5 h-5 text-gray-400"></i>Contact</a>
+            </div>
+            <div class="pt-6 border-t border-black/5 w-full shrink-0">
+                <a href="contact.html" class="w-full flex items-center justify-center gap-2 bg-accent hover:bg-accent-hover text-white text-sm font-medium px-6 py-3.5 rounded-xl transition-all duration-200 active:scale-95 accent-glow">Get Started <i data-lucide="arrow-right" class="w-4 h-4"></i></a>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== HERO BANNER ===== -->
+    <section class="relative pt-16 sm:pt-20 min-h-screen min-h-[100dvh] sm:min-h-screen flex items-stretch sm:items-center justify-center overflow-hidden">
+        <img src="image/contact-hero.jpg" alt="Contact" class="absolute inset-0 w-full h-full object-cover">
+        <div class="absolute inset-0 bg-gradient-to-r from-black/75 via-black/55 to-black/30"></div>
+        <div class="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent"></div>
+        <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 w-full flex flex-col sm:block text-center justify-between py-12 sm:py-0">
+            <div class="pt-10 sm:pt-0">
+                <div class="hero-anim hero-d1 inline-flex items-center gap-2 bg-white/10 border border-white/20 rounded-full px-5 py-2 sm:px-4 sm:py-1.5 sm:mb-8 backdrop-blur-md">
+                    <i data-lucide="mail" class="w-4 h-4 sm:w-3.5 sm:h-3.5 text-accent-light"></i>
+                    <span class="text-sm sm:text-xs text-white/90 font-medium">Get In Touch</span>
+                </div>
+            </div>
+            <div class="flex-1 flex items-center justify-center">
+                <h1 class="hero-anim hero-d2 font-brand font-bold tracking-tight text-white sm:mb-6" style="font-size: clamp(2.8rem, 9vw, 5rem); line-height: 1.05;">
+                    Let's Build Something<br><span class="text-accent-light text-glow">Great Together</span>
+                </h1>
+            </div>
+            <div class="pb-10 sm:pb-0">
+                <p class="hero-anim hero-d3 text-base sm:text-base sm:text-lg lg:text-xl font-light text-white/80 leading-relaxed max-w-2xl mx-auto sm:mb-10">
+                    Have a project in mind? We'd love to hear about it. Reach out and let's discuss how we can transform your ideas into reality.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== CONTACT FORM + INFO (Image Left + Form Right) ===== -->
+    <section class="py-12 sm:py-20 lg:py-24 relative">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6">
+            <div class="grid lg:grid-cols-2 gap-12 lg:gap-20 items-start">
+                <!-- Left: Image with Contact Info Overlay -->
+                <div class="relative reveal-left">
+                    <div class="rounded-3xl overflow-hidden shadow-2xl h-auto min-h-[320px] sm:h-[500px] lg:h-[750px]">
+                        <img src="image/contact-office.jpg" alt="Contact Auratech" class="w-full h-full object-cover">
+                        <div class="img-overlay-strong"></div>
+                        <div class="absolute inset-0 flex flex-col justify-end p-5 sm:p-8 md:p-12 z-10">
+                            <div class="inline-flex items-center gap-2 bg-accent/20 border border-accent/30 rounded-full px-3 py-1 sm:px-4 sm:py-1.5 mb-3 sm:mb-6 backdrop-blur-md w-fit">
+                                <i data-lucide="message-circle" class="w-3.5 h-3.5 text-accent-light"></i>
+                                <span class="text-xs text-white/90 font-medium">Contact Info</span>
+                            </div>
+                            <h2 class="font-brand text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight text-white mb-4 sm:mb-8 leading-tight">We're here to <span class="text-accent-light">help</span></h2>
+                            
+                            <div class="space-y-3 sm:space-y-5">
+                                <a href="mailto:auradesigners0@gmail.com" class="flex items-center gap-3 sm:gap-4 group">
+                                    <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-white/10 border border-white/20 flex items-center justify-center shrink-0 backdrop-blur-sm group-hover:bg-accent/30 transition-colors"><i data-lucide="mail" class="w-4 h-4 sm:w-5 sm:h-5 text-white"></i></div>
+                                    <div>
+                                        <div class="text-[0.65rem] sm:text-xs text-white/50 uppercase tracking-wider mb-0.5">Email Us</div>
+                                        <div class="text-xs sm:text-sm text-white font-medium">auradesigners0@gmail.com</div>
+                                    </div>
+                                </a>
+                                <a href="https://wa.me/0717043283" target="_blank" rel="noopener noreferrer" class="flex items-center gap-3 sm:gap-4 group">
+                                    <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-white/10 border border-white/20 flex items-center justify-center shrink-0 backdrop-blur-sm group-hover:bg-accent/30 transition-colors"><i data-lucide="message-circle" class="w-4 h-4 sm:w-5 sm:h-5 text-white"></i></div>
+                                    <div>
+                                        <div class="text-[0.65rem] sm:text-xs text-white/50 uppercase tracking-wider mb-0.5">WhatsApp</div>
+                                        <div class="text-xs sm:text-sm text-white font-medium">0717 043 283</div>
+                                    </div>
+                                </a>
+                                <div class="flex items-center gap-3 sm:gap-4">
+                                    <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-white/10 border border-white/20 flex items-center justify-center shrink-0 backdrop-blur-sm"><i data-lucide="clock" class="w-4 h-4 sm:w-5 sm:h-5 text-white"></i></div>
+                                    <div>
+                                        <div class="text-[0.65rem] sm:text-xs text-white/50 uppercase tracking-wider mb-0.5">Response Time</div>
+                                        <div class="text-xs sm:text-sm text-white font-medium">Within 24 hours</div>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-3 sm:gap-4">
+                                    <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-white/10 border border-white/20 flex items-center justify-center shrink-0 backdrop-blur-sm"><i data-lucide="map-pin" class="w-4 h-4 sm:w-5 sm:h-5 text-white"></i></div>
+                                    <div>
+                                        <div class="text-[0.65rem] sm:text-xs text-white/50 uppercase tracking-wider mb-0.5">Location</div>
+                                        <div class="text-xs sm:text-sm text-white font-medium">Tanzania</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="flex items-center gap-3 mt-4 sm:mt-8 pt-4 sm:pt-6 border-t border-white/10">
+                                <div class="security-badge bg-white/10 border-white/20 text-white/70"><i data-lucide="lock" class="w-3 h-3 text-accent-light"></i> SSL Encrypted</div>
+                                <div class="security-badge bg-white/10 border-white/20 text-white/70"><i data-lucide="shield-check" class="w-3 h-3 text-accent-light"></i> Anti-Spam</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right: Secure Contact Form -->
+                <div class="reveal-right">
+                    <div class="glass-card rounded-2xl p-5 sm:p-8 relative overflow-hidden shadow-lg">
+                        <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[300px] h-[100px] opacity-[0.06]" style="background: radial-gradient(ellipse, #009639, transparent 70%); filter: blur(60px);"></div>
+                        <div class="relative z-10">
+                            <div class="flex items-center justify-between mb-6">
+                                <h3 class="text-xl font-brand font-semibold tracking-tight text-gray-900">Send a Message</h3>
+                                <div class="flex items-center gap-1.5"><i data-lucide="lock" class="w-3.5 h-3.5 text-accent"></i><span class="text-xs text-gray-500">Secure Form</span></div>
+                            </div>
+                            <form id="contactForm" novalidate autocomplete="off">
+                                <div class="honeypot-field" aria-hidden="true"><label for="hp_website">Website</label><input type="text" id="hp_website" name="website" tabindex="-1" autocomplete="off"></div>
+                                <input type="hidden" id="csrfToken" name="csrf_token" value="">
+                                <div class="space-y-5">
+                                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                        <div><label for="firstName" class="form-label">First Name <span class="text-red-500">*</span></label><input type="text" id="firstName" name="first_name" class="form-input" placeholder="First" required maxlength="50" autocomplete="given-name"><div class="form-error" id="firstNameError">Please enter your first name</div></div>
+                                        <div><label for="lastName" class="form-label">Last Name <span class="text-red-500">*</span></label><input type="text" id="lastName" name="last_name" class="form-input" placeholder="Last" required maxlength="50" autocomplete="family-name"><div class="form-error" id="lastNameError">Please enter your last name</div></div>
+                                    </div>
+                                    <div><label for="email" class="form-label">Email Address <span class="text-red-500">*</span></label><input type="email" id="email" name="email" class="form-input" placeholder="you@company.com" required maxlength="254" autocomplete="email"><div class="form-error" id="emailError">Please enter a valid email address</div></div>
+                                    <div><label for="phone" class="form-label">Phone Number <span class="text-gray-400 text-xs font-normal">(optional)</span></label><input type="tel" id="phone" name="phone" class="form-input" placeholder="0717 043 283" maxlength="20" autocomplete="tel"><div class="form-error" id="phoneError">Please enter a valid phone number</div></div>
+                                    <div><label for="service" class="form-label">Service Interested In <span class="text-red-500">*</span></label><select id="service" name="service" class="form-input cursor-pointer" required style="appearance: none; background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%239CA3AF%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22m6%209%206%206%206-6%22%2F%3E%3C%2Fsvg%3E'); background-repeat: no-repeat; background-position: right 0.75rem center; background-size: 1rem;"><option value="" disabled selected style="color: #9CA3AF; background: #ffffff;">Select a service</option><option value="branding" style="background: #ffffff;">Digital Branding & Identity</option><option value="web" style="background: #ffffff;">Smart Web Solutions</option><option value="content" style="background: #ffffff;">Content Creation & Studio</option><option value="community" style="background: #ffffff;">Community Empowerment</option><option value="other" style="background: #ffffff;">Other</option></select><div class="form-error" id="serviceError">Please select a service</div></div>
+                                    <div><label for="message" class="form-label">Project Details <span class="text-red-500">*</span></label><textarea id="message" name="message" class="form-input resize-none" rows="4" placeholder="Tell us about your project, goals, and timeline..." required maxlength="2000"></textarea><div class="flex items-center justify-between mt-1.5"><div class="form-error" id="messageError">Please describe your project (min 20 characters)</div><span class="text-xs text-gray-500 shrink-0 ml-4" id="charCount">0 / 2000</span></div></div>
+                                    <div class="flex items-start gap-3"><input type="checkbox" id="consent" name="consent" class="mt-0.5 w-4 h-4 rounded border-gray-300 bg-white text-accent focus:ring-accent/30 focus:ring-offset-0 cursor-pointer" required><label for="consent" class="text-xs text-gray-600 leading-relaxed cursor-pointer">I agree to the <a href="#" class="text-accent hover:underline">Privacy Policy</a> and consent to AURATECH processing my data securely. <span class="text-red-500">*</span></label></div>
+                                    <div class="form-error" id="consentError" style="margin-top: -0.25rem;">You must agree to the privacy policy</div>
+                                    <div id="rateLimitNotice" class="hidden bg-red-50 border border-red-200 rounded-lg p-3 flex items-center gap-2"><i data-lucide="alert-triangle" class="w-4 h-4 text-red-500 shrink-0"></i><span class="text-xs text-red-600">Too many attempts. Please wait before submitting again.</span></div>
+                                    <button type="submit" id="submitBtn" class="w-full flex items-center justify-center gap-2.5 bg-accent hover:bg-accent-hover text-white font-medium px-8 py-4 rounded-xl transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] accent-glow text-sm disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"><span id="submitText">Send Secure Message</span><i data-lucide="send" class="w-4 h-4" id="submitIcon"></i><svg id="submitSpinner" class="hidden w-4 h-4 spin-slow" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3" stroke-linecap="round" class="opacity-25"></circle><path d="M4 12a8 8 0 018-8" stroke="currentColor" stroke-width="3" stroke-linecap="round" class="opacity-75"></path></svg></button>
+                                    <div class="flex items-center justify-center gap-4 pt-2"><div class="security-badge"><svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>AES-256</div><div class="security-badge"><i data-lucide="timer" class="w-3 h-3 text-accent"></i><span id="formTimer">Token expires in 30:00</span></div></div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== DIRECT CHANNELS (Image Cards) ===== -->
+    <section class="py-12 sm:py-20 lg:py-24 relative border-t border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6">
+            <div class="text-center max-w-2xl mx-auto mb-16">
+                <div class="reveal inline-flex items-center gap-2 bg-accent/5 border border-accent/15 rounded-full px-4 py-1.5 mb-6">
+                    <i data-lucide="zap" class="w-3.5 h-3.5 text-accent"></i>
+                    <span class="text-xs text-gray-700 font-medium">Quick Connect</span>
+                </div>
+                <h2 class="reveal stagger-1 font-brand text-3xl md:text-4xl font-bold tracking-tight text-gray-900">Prefer a direct <span class="text-accent">channel?</span></h2>
+            </div>
+            <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <a href="https://wa.me/0717043283" target="_blank" rel="noopener noreferrer" class="glass-card rounded-2xl p-6 group cursor-pointer reveal stagger-1 hover:shadow-lg transition-all duration-300 h-full block">
+                    <div class="w-12 h-12 rounded-xl bg-[#25D366]/10 border border-[#25D366]/20 flex items-center justify-center mb-4"><svg class="w-5 h-5 text-accent" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg></div>
+                    <h3 class="text-lg font-brand font-semibold text-gray-900 mb-2">Chat on WhatsApp</h3>
+                    <p class="text-sm text-gray-600 leading-relaxed">Quick questions? Get instant replies during business hours.</p>
+                    <span class="inline-flex items-center gap-1.5 text-xs text-[#25D366] font-medium mt-3 group-hover:gap-2.5 transition-all">Open Chat <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i></span>
+                </a>
+                <a href="mailto:auradesigners0@gmail.com" class="glass-card rounded-2xl p-6 group cursor-pointer reveal stagger-2 hover:shadow-lg transition-all duration-300 h-full block">
+                    <div class="w-12 h-12 rounded-xl bg-accent/10 border border-accent/20 flex items-center justify-center mb-4"><i data-lucide="mail" class="w-5 h-5 text-accent"></i></div>
+                    <h3 class="text-lg font-brand font-semibold text-gray-900 mb-2">Send an Email</h3>
+                    <p class="text-sm text-gray-600 leading-relaxed">Detailed briefs and project proposals. We respond within 24h.</p>
+                    <span class="inline-flex items-center gap-1.5 text-xs text-accent font-medium mt-3 group-hover:gap-2.5 transition-all">Compose Email <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i></span>
+                </a>
+                <a href="service.html" class="glass-card rounded-2xl p-6 group cursor-pointer reveal stagger-3 hover:shadow-lg transition-all duration-300 h-full block">
+                    <div class="w-12 h-12 rounded-xl bg-accent/10 border border-accent/20 flex items-center justify-center mb-4"><i data-lucide="layers" class="w-5 h-5 text-accent"></i></div>
+                    <h3 class="text-lg font-brand font-semibold text-gray-900 mb-2">Explore Services</h3>
+                    <p class="text-sm text-gray-600 leading-relaxed">Not sure what you need? Browse our full-spectrum solutions.</p>
+                    <span class="inline-flex items-center gap-1.5 text-xs text-gray-500 font-medium mt-3 group-hover:gap-2.5 transition-all">View Services <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i></span>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== WHAT HAPPENS NEXT ===== -->
+    <section class="py-12 sm:py-20 lg:py-24 relative border-t border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6">
+            <div class="text-center max-w-2xl mx-auto mb-16">
+                <div class="reveal inline-flex items-center gap-2 bg-accent/5 border border-accent/15 rounded-full px-4 py-1.5 mb-6">
+                    <i data-lucide="git-branch" class="w-3.5 h-3.5 text-accent"></i>
+                    <span class="text-xs text-gray-700 font-medium">The Process</span>
+                </div>
+                <h2 class="reveal stagger-1 font-brand text-3xl md:text-4xl font-bold tracking-tight text-gray-900">What happens <span class="text-accent">next?</span></h2>
+            </div>
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="relative reveal stagger-1">
+                    <div class="flex items-center gap-3 mb-3">
+                        <span class="w-8 h-8 rounded-lg bg-accent text-white font-brand font-bold text-sm flex items-center justify-center">01</span>
+                        <h3 class="font-brand font-semibold text-gray-900">Submit & Review</h3>
+                    </div>
+                    <p class="text-sm text-gray-600 leading-relaxed">Your message is encrypted and sent securely. Our team reviews your project details and prepares initial thoughts within hours.</p>
+                </div>
+                <div class="relative reveal stagger-2">
+                    <div class="flex items-center gap-3 mb-3">
+                        <span class="w-8 h-8 rounded-lg bg-accent text-white font-brand font-bold text-sm flex items-center justify-center">02</span>
+                        <h3 class="font-brand font-semibold text-gray-900">Strategy Call</h3>
+                    </div>
+                    <p class="text-sm text-gray-600 leading-relaxed">We schedule a free consultation to understand your vision, discuss scope, and explore how our services align with your goals.</p>
+                </div>
+                <div class="relative reveal stagger-3">
+                    <div class="flex items-center gap-3 mb-3">
+                        <span class="w-8 h-8 rounded-lg bg-accent text-white font-brand font-bold text-sm flex items-center justify-center">03</span>
+                        <h3 class="font-brand font-semibold text-gray-900">Project Kickoff</h3>
+                    </div>
+                    <p class="text-sm text-gray-600 leading-relaxed">Once aligned, we hit the ground running. Strategy, design, and development begin — with full transparency at every step.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== FAQ ===== -->
+    <section class="py-12 sm:py-20 lg:py-24 relative border-t border-gray-200">
+        <div class="max-w-3xl mx-auto px-4 sm:px-6">
+            <div class="text-center mb-16">
+                <div class="reveal inline-flex items-center gap-2 bg-accent/5 border border-accent/15 rounded-full px-4 py-1.5 mb-6">
+                    <i data-lucide="help-circle" class="w-3.5 h-3.5 text-accent"></i>
+                    <span class="text-xs text-gray-700 font-medium">FAQ</span>
+                </div>
+                <h2 class="reveal stagger-1 font-brand text-3xl md:text-4xl font-bold tracking-tight text-gray-900">Common <span class="text-accent">questions</span></h2>
+            </div>
+            <div class="space-y-4">
+                <div class="glass-card rounded-2xl p-6 reveal stagger-1">
+                    <h4 class="font-brand font-semibold text-gray-900 mb-2">How much does a project typically cost?</h4>
+                    <p class="text-sm text-gray-600 leading-relaxed">Every project is unique. We provide detailed quotes after understanding your scope and goals. Our approach ensures you only pay for what you need — no hidden fees, no bloated budgets.</p>
+                </div>
+                <div class="glass-card rounded-2xl p-6 reveal stagger-2">
+                    <h4 class="font-brand font-semibold text-gray-900 mb-2">How long does it take to complete a project?</h4>
+                    <p class="text-sm text-gray-600 leading-relaxed">Timelines vary by complexity. A brand identity typically takes 2-4 weeks, a website 4-8 weeks, and content campaigns run on monthly cycles. We always agree on deadlines before starting.</p>
+                </div>
+                <div class="glass-card rounded-2xl p-6 reveal stagger-3">
+                    <h4 class="font-brand font-semibold text-gray-900 mb-2">Do you work with clients outside Tanzania?</h4>
+                    <p class="text-sm text-gray-600 leading-relaxed">Absolutely. While we're rooted in Tanzania, our digital-first approach means we work seamlessly with clients globally through video calls, shared project boards, and real-time collaboration tools.</p>
+                </div>
+                <div class="glass-card rounded-2xl p-6 reveal stagger-4">
+                    <h4 class="font-brand font-semibold text-gray-900 mb-2">What if I'm not sure which service I need?</h4>
+                    <p class="text-sm text-gray-600 leading-relaxed">That's perfectly fine! Our free consultation is designed to help you figure that out. We'll analyze your challenges and recommend the right combination of services to achieve your goals.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Toast -->
+    <div id="toast" class="toast"><div class="glass-high rounded-xl p-4 flex items-center gap-3 border border-gray-200 max-w-md shadow-xl"><div id="toastIcon" class="w-8 h-8 rounded-lg flex items-center justify-center shrink-0"></div><div><div id="toastTitle" class="text-sm font-medium text-gray-900"></div><div id="toastMsg" class="text-xs text-gray-600 mt-0.5"></div></div><button onclick="hideToast()" class="ml-auto text-gray-400 hover:text-gray-600 transition-colors"><i data-lucide="x" class="w-4 h-4"></i></button></div></div>
+
+    <!-- Footer -->
+    <footer class="border-t border-gray-200 py-16 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-10 mb-14">
+                <div class="col-span-2 md:col-span-1 reveal-left">
+                    <a href="index.html" class="flex items-center gap-3 mb-4"><img src="image/logo.png" alt="AURATECH Logo" class="h-10 w-auto"></a>
+                    <p class="text-sm text-gray-600 leading-relaxed max-w-xs mb-6">Innovating design. Empowering growth. Since 2023.</p>
+                    <div class="flex items-center gap-3">
+                        <a href="https://wa.me/0717043283" target="_blank" rel="noopener noreferrer" class="w-10 h-10 rounded-xl bg-gray-100 border border-gray-200 flex items-center justify-center hover:bg-[#25D366]/10 hover:border-[#25D366]/20 transition-all duration-200 group" aria-label="WhatsApp"><svg class="w-[18px] h-[18px] text-gray-500 group-hover:text-[#25D366] transition-colors" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg></a>
+                        <a href="https://www.instagram.com/aurawebdesigners?igsh=a2s2OHZxMnFkN2Y4" target="_blank" rel="noopener noreferrer" class="w-10 h-10 rounded-xl bg-gray-100 border border-gray-200 flex items-center justify-center hover:bg-[#E4405F]/10 hover:border-[#E4405F]/20 transition-all duration-200 group" aria-label="Instagram"><svg class="w-[18px] h-[18px] text-gray-500 group-hover:text-[#E4405F] transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg></a>
+                        <a href="https://linkedin.com/company/auratech" target="_blank" rel="noopener noreferrer" class="w-10 h-10 rounded-xl bg-gray-100 border border-gray-200 flex items-center justify-center hover:bg-[#0A66C2]/10 hover:border-[#0A66C2]/20 transition-all duration-200 group" aria-label="LinkedIn"><svg class="w-[18px] h-[18px] text-gray-500 group-hover:text-[#0A66C2] transition-colors" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg></a>
+                    </div>
+                </div>
+                <div class="reveal-top stagger-1"><h4 class="text-sm font-medium text-gray-900 mb-4">Services</h4><ul class="space-y-3"><li><a href="service.html#branding" class="text-sm text-gray-600 hover:text-gray-900 transition-colors">Digital Branding</a></li><li><a href="service.html#web" class="text-sm text-gray-600 hover:text-gray-900 transition-colors">Web Solutions</a></li><li><a href="service.html#content" class="text-sm text-gray-600 hover:text-gray-900 transition-colors">Content Creation</a></li><li><a href="service.html#community" class="text-sm text-gray-600 hover:text-gray-900 transition-colors">Community</a></li></ul></div>
+                <div class="reveal stagger-2"><h4 class="text-sm font-medium text-gray-900 mb-4">Company</h4><ul class="space-y-3"><li><a href="about.html" class="text-sm text-gray-600 hover:text-gray-900 transition-colors">About Us</a></li><li><a href="#" class="text-sm text-gray-600 hover:text-gray-900 transition-colors">Careers</a></li><li><a href="contact.html" class="text-sm text-gray-600 hover:text-gray-900 transition-colors">Contact</a></li></ul></div>
+                <div class="reveal-right stagger-3"><h4 class="text-sm font-medium text-gray-900 mb-4">Legal</h4><ul class="space-y-3"><li><a href="#" class="text-sm text-gray-600 hover:text-gray-900 transition-colors">Privacy Policy</a></li><li><a href="#" class="text-sm text-gray-600 hover:text-gray-900 transition-colors">Terms of Service</a></li></ul></div>
+            </div>
+            <div class="pt-8 border-t border-gray-200 flex flex-col md:flex-row items-center justify-between gap-4 reveal">
+                <p class="text-xs text-gray-500">© 2025 AURATECH. All rights reserved.</p>
+                <div class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-green-500"></span><span class="text-xs text-gray-500">All systems operational</span></div>
+            </div>
+        </div>
+    </footer>
+
+    <button id="backToTop" class="fixed bottom-6 right-6 z-50 w-10 h-10 rounded-xl glass-high border border-gray-200 flex items-center justify-center opacity-0 translate-y-4 transition-all duration-300 pointer-events-none hover:bg-gray-100 shadow-lg" aria-label="Back to top"><i data-lucide="chevron-up" class="w-4 h-4 text-gray-700"></i></button>
+
+    <script>
+        // ===== PRELOADER =====
+        window.addEventListener('load', () => {
+            const logo = document.querySelector('.preloader-logo');
+            setTimeout(() => { logo.classList.add('landed'); }, 1800);
+            setTimeout(() => {
+                logo.classList.remove('landed'); logo.classList.add('exit');
+                document.querySelector('.preloader-ring-outer').classList.add('exit');
+                document.querySelector('.preloader-ring-inner').classList.add('exit');
+                document.querySelector('.preloader-glow').classList.add('exit');
+            }, 3200);
+            setTimeout(() => { document.getElementById('preloader').classList.add('hidden'); }, 4000);
+        });
+
+        lucide.createIcons();
+
+        // Smooth scroll
+        const NAV_HEIGHT = 80;
+        function smoothScrollTo(selector) {
+            const el = document.querySelector(selector);
+            if (!el) return;
+            const y = el.getBoundingClientRect().top + window.pageYOffset - NAV_HEIGHT;
+            window.scrollTo({ top: y, behavior: 'smooth' });
+        }
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                const href = this.getAttribute('href');
+                if (href === '#') { e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' }); if (menuOpen) closeMobileMenu(); return; }
+                e.preventDefault(); smoothScrollTo(href); if (menuOpen) closeMobileMenu();
+            });
+        });
+
+        // Reveal on scroll
+        const revealElements = document.querySelectorAll('.reveal, .reveal-left, .reveal-right, .reveal-scale');
+        const revealObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => { if (entry.isIntersecting) { entry.target.classList.add('visible'); revealObserver.unobserve(entry.target); } });
+        }, { threshold: 0.05, rootMargin: '0px 0px -20px 0px' });
+        revealElements.forEach(el => revealObserver.observe(el));
+
+        // Mobile menu
+        const mobileToggle = document.getElementById('mobileToggle');
+
+        const mainNav = document.getElementById('mainNav');
+        const heroSection = document.getElementById('home') || document.querySelector('section');
+
+        function updateNav() {
+            if (!heroSection) return;
+            const heroBottom = heroSection.getBoundingClientRect().bottom;
+            if (heroBottom <= 64) {
+                mainNav.classList.remove('nav-transparent');
+                mainNav.classList.add('nav-scrolled');
+            } else {
+                mainNav.classList.add('nav-transparent');
+                mainNav.classList.remove('nav-scrolled');
+            }
+        }
+        window.addEventListener('scroll', updateNav, { passive: true });
+        updateNav();
+
+        const mobileMenuOverlay = document.getElementById('mobileMenuOverlay');
+        const menuIconOpen = document.getElementById('menuIconOpen');
+        const menuIconClose = document.getElementById('menuIconClose');
+        let menuOpen = false;
+        function closeMobileMenu() { mobileMenuOverlay.classList.remove('open'); menuOpen = false; mobileToggle.setAttribute('aria-expanded', 'false'); menuIconOpen.classList.remove('hidden'); menuIconClose.classList.add('hidden'); document.body.style.overflow = ''; }
+        function openMobileMenu() { mobileMenuOverlay.classList.add('open'); menuOpen = true; mobileToggle.setAttribute('aria-expanded', 'true'); menuIconOpen.classList.add('hidden'); menuIconClose.classList.remove('hidden'); document.body.style.overflow = 'hidden'; }
+        mobileToggle.addEventListener('click', () => { menuOpen ? closeMobileMenu() : openMobileMenu(); });
+        document.getElementById('mobileMenuClose').addEventListener('click', closeMobileMenu);
+        document.addEventListener('click', (e) => { if (menuOpen && !mobileMenuOverlay.contains(e.target) && !mobileToggle.contains(e.target)) closeMobileMenu(); });
+        document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && menuOpen) closeMobileMenu(); });
+
+        // Back to top
+        const backToTop = document.getElementById('backToTop');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 500) { backToTop.classList.remove('opacity-0','translate-y-4','pointer-events-none'); backToTop.classList.add('opacity-100','translate-y-0','pointer-events-auto'); }
+            else { backToTop.classList.add('opacity-0','translate-y-4','pointer-events-none'); backToTop.classList.remove('opacity-100','translate-y-0','pointer-events-auto'); }
+        }, { passive: true });
+        backToTop.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+        // Collapsible cards on mobile
+        document.querySelectorAll('.mobile-collapsible').forEach(card => {
+            card.addEventListener('click', function(e) {
+                if (window.innerWidth > 640) return;
+                e.preventDefault();
+                e.stopPropagation();
+                const wasOpen = this.classList.contains('open');
+                // Close all other collapsibles in the same grid/section
+                const container = this.closest('.grid, section');
+                if (container) {
+                    container.querySelectorAll('.mobile-collapsible.open').forEach(other => {
+                        if (other !== this) other.classList.remove('open');
+                    });
+                }
+                // Toggle current
+                if (wasOpen) {
+                    this.classList.remove('open');
+                } else {
+                    this.classList.add('open');
+                }
+            });
+        });
+
+
+        // ===== CONTACT FORM LOGIC =====
+        function generateCSRF() { const a = new Uint8Array(32); crypto.getRandomValues(a); return Array.from(a, b => b.toString(16).padStart(2,'0')).join(''); }
+        document.getElementById('csrfToken').value = generateCSRF();
+        
+        let formSeconds = 1800;
+        const formTimerEl = document.getElementById('formTimer');
+        const formTimerInterval = setInterval(() => {
+            formSeconds--;
+            if (formSeconds <= 0) { clearInterval(formTimerInterval); formTimerEl.textContent = 'Token expired'; formTimerEl.classList.add('text-red-500'); document.getElementById('submitBtn').disabled = true; showToast('warning','Session Expired','Please refresh the page.'); return; }
+            formTimerEl.textContent = `Token expires in ${Math.floor(formSeconds/60)}:${(formSeconds%60).toString().padStart(2,'0')}`;
+            if (formSeconds < 300) formTimerEl.classList.add('text-yellow-600');
+        }, 1000);
+        
+        const messageField = document.getElementById('message'), charCount = document.getElementById('charCount');
+        messageField.addEventListener('input', () => { const l = messageField.value.length; charCount.textContent = `${l} / 2000`; charCount.classList.toggle('text-red-500', l > 1800); charCount.classList.toggle('text-gray-500', l <= 1800); });
+        
+        let attemptTimestamps = [];
+        function checkRateLimit() { const n = Date.now(); attemptTimestamps = attemptTimestamps.filter(t => n - t < 60000); return attemptTimestamps.length < 5; }
+        function sanitize(s) { const d = document.createElement('div'); d.textContent = s; return d.innerHTML.trim(); }
+        function validateField(id, c) { const i = document.getElementById(id), e = document.getElementById(id+'Error'); if (!c) { i.classList.add('error'); i.classList.remove('success'); if (e) e.classList.add('visible'); return false; } i.classList.remove('error'); i.classList.add('success'); if (e) e.classList.remove('visible'); return true; }
+        
+        document.getElementById('firstName').addEventListener('blur', function() { validateField('firstName', this.value.trim().length >= 1); });
+        document.getElementById('lastName').addEventListener('blur', function() { validateField('lastName', this.value.trim().length >= 1); });
+        document.getElementById('email').addEventListener('blur', function() { validateField('email', /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(this.value.trim())); });
+        document.getElementById('phone').addEventListener('blur', function() { if (this.value.trim()) validateField('phone', /^[\+]?[\d\s\-\(\)]{7,20}$/.test(this.value.trim())); else { this.classList.remove('error','success'); document.getElementById('phoneError').classList.remove('visible'); } });
+        document.getElementById('service').addEventListener('change', function() { validateField('service', this.value !== ''); });
+        document.getElementById('message').addEventListener('blur', function() { validateField('message', this.value.trim().length >= 20); });
+        document.querySelectorAll('.form-input').forEach(i => { i.addEventListener('input', function() { this.classList.remove('error'); const e = document.getElementById(this.id+'Error'); if (e) e.classList.remove('visible'); }); });
+        
+        // Toast
+        function showToast(type, title, msg) {
+            const toast = document.getElementById('toast'), icon = document.getElementById('toastIcon');
+            document.getElementById('toastTitle').textContent = title; document.getElementById('toastMsg').textContent = msg;
+            if (type === 'success') { icon.className = 'w-8 h-8 rounded-lg flex items-center justify-center shrink-0 bg-green-50'; icon.innerHTML = '<svg class="w-4 h-4 text-green-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>'; }
+            else if (type === 'error') { icon.className = 'w-8 h-8 rounded-lg flex items-center justify-center shrink-0 bg-red-50'; icon.innerHTML = '<svg class="w-4 h-4 text-red-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>'; }
+            else { icon.className = 'w-8 h-8 rounded-lg flex items-center justify-center shrink-0 bg-yellow-50'; icon.innerHTML = '<svg class="w-4 h-4 text-yellow-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>'; }
+            toast.classList.add('show'); clearTimeout(toast._timer); toast._timer = setTimeout(hideToast, 5000);
+        }
+        function hideToast() { document.getElementById('toast').classList.remove('show'); }
+        
+        document.getElementById('contactForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            if (document.getElementById('hp_website').value !== '') { showToast('success','Message Sent','Thank you!'); this.reset(); return; }
+            if (!checkRateLimit()) { document.getElementById('rateLimitNotice').classList.remove('hidden'); showToast('error','Rate Limited','Too many submissions.'); return; }
+            document.getElementById('rateLimitNotice').classList.add('hidden');
+            const fn = sanitize(document.getElementById('firstName').value), ln = sanitize(document.getElementById('lastName').value), em = sanitize(document.getElementById('email').value), ph = sanitize(document.getElementById('phone').value), sv = document.getElementById('service').value, ms = sanitize(document.getElementById('message').value), co = document.getElementById('consent').checked;
+            let v = true;
+            v = validateField('firstName', fn.length >= 1) & v; v = validateField('lastName', ln.length >= 1) & v; v = validateField('email', /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(em)) & v;
+            if (ph) v = validateField('phone', /^[\+]?[\d\s\-\(\)]{7,20}$/.test(ph)) & v;
+            v = validateField('service', sv !== '') & v; v = validateField('message', ms.length >= 20) & v;
+            const ce = document.getElementById('consentError'); if (!co) { ce.classList.add('visible'); v = false; } else ce.classList.remove('visible');
+            if (!v) { showToast('error','Validation Error','Please fix highlighted fields.'); const fe = document.querySelector('.form-input.error'); if (fe) fe.focus(); return; }
+            attemptTimestamps.push(Date.now());
+            const btn = document.getElementById('submitBtn'), txt = document.getElementById('submitText'), ico = document.getElementById('submitIcon'), spn = document.getElementById('submitSpinner');
+            btn.disabled = true; txt.textContent = 'Sending...'; ico.classList.add('hidden'); spn.classList.remove('hidden');
+
+            // ===== EMAILJS INTEGRATION =====
+            const EMAILJS_SERVICE_ID   = 'service_ungsehi';
+            const EMAILJS_TEMPLATE_NOTIFY = 'template_zcwn90g';   // Notification to you
+            const EMAILJS_TEMPLATE_AUTOREPLY = 'template_e4i4oo9'; // Auto-reply to customer
+            const EMAILJS_PUBLIC_KEY   = 'h2bxvU7nIshl_AEFm';
+
+            // Map form fields to EmailJS template variables
+            const templateParams = {
+                from_name: fn + ' ' + ln,
+                first_name: fn,
+                last_name: ln,
+                email: em,
+                phone: ph || 'Not provided',
+                service: sv,
+                message: ms,
+                consent: co ? 'Yes' : 'No'
+            };
+
+            // Send 1: Notification email to you
+            emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_NOTIFY, templateParams, EMAILJS_PUBLIC_KEY)
+                .then(function() {
+                    // Notification sent — now send auto-reply to customer
+                    return emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_AUTOREPLY, templateParams, EMAILJS_PUBLIC_KEY);
+                })
+                .then(function() {
+                    // Both emails sent successfully
+                    btn.disabled = false; txt.textContent = 'Send Secure Message'; ico.classList.remove('hidden'); spn.classList.add('hidden');
+                    document.getElementById('csrfToken').value = generateCSRF(); document.getElementById('contactForm').reset();
+                    document.querySelectorAll('.form-input').forEach(i => i.classList.remove('success','error')); document.querySelectorAll('.form-error').forEach(e => e.classList.remove('visible'));
+                    charCount.textContent = '0 / 2000'; charCount.classList.remove('text-red-500'); charCount.classList.add('text-gray-500');
+                    document.getElementById('consentError').classList.remove('visible');
+                    showToast('success','Message Sent Successfully','Your inquiry has been received. Check your email for confirmation!');
+                })
+                .catch(function(error) {
+                    // Error (either notification or auto-reply failed)
+                    btn.disabled = false; txt.textContent = 'Send Secure Message'; ico.classList.remove('hidden'); spn.classList.add('hidden');
+                    console.error('EmailJS Error:', error);
+                    showToast('error','Sending Failed','Something went wrong. Please try again or email us directly at auradesigners0@gmail.com');
+                });
+        });
+    </script>
+</body>
+</html>
