@@ -7,6 +7,8 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+    <!-- Google reCAPTCHA v2 -->
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <script>
@@ -98,6 +100,15 @@
         .form-error.visible { display: block; }
         .honeypot-field { position: absolute; left: -9999px; top: -9999px; opacity: 0; height: 0; width: 0; pointer-events: none; }
         .security-badge { display: inline-flex; align-items: center; gap: 0.375rem; font-size: 0.6875rem; color: #6B7280; background: rgba(0,0,0,0.04); border: 1px solid rgba(0,0,0,0.08); border-radius: 9999px; padding: 0.25rem 0.625rem; }
+
+        /* reCAPTCHA v2 styling */
+        .recaptcha-wrapper { display: flex; justify-content: center; margin: 0.5rem 0; }
+        .recaptcha-wrapper > div { display: inline-block; }
+        .form-error#recaptchaError { text-align: center; }
+        /* Dark theme for reCAPTCHA when inside the overlay image card */
+        @media (max-width: 640px) {
+            .recaptcha-wrapper { transform: scale(0.9); transform-origin: center; }
+        }
         @keyframes spin-slow { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
         .spin-slow { animation: spin-slow 2s linear infinite; }
         .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(100px); z-index: 100; transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s ease; opacity: 0; pointer-events: none; }
@@ -250,23 +261,23 @@
     </div>
 
     <!-- ===== HERO BANNER ===== -->
-    <section class="hero-section relative pt-16 sm:pt-20 min-h-screen min-h-[100dvh] sm:min-h-screen flex items-stretch sm:items-center justify-center overflow-hidden">
+    <section class="hero-section relative pt-16 sm:pt-20 min-h-screen min-h-[100dvh] sm:min-h-screen flex items-center justify-center overflow-hidden">
         <img src="image/contact-hero.jpg" alt="Contact" class="absolute inset-0 w-full h-full object-cover">
         <div class="absolute inset-0 bg-gradient-to-r from-black/75 via-black/55 to-black/30"></div>
         <div class="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent"></div>
-        <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 w-full flex flex-col sm:block text-center justify-between py-12 sm:py-0">
-            <div class="pt-10 sm:pt-0">
+        <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 w-full flex flex-col items-center justify-center text-center py-16 sm:py-0 pb-20 sm:pb-0">
+            <div class="mb-4 sm:mb-8">
                 <div class="hero-anim hero-d1 inline-flex items-center gap-2 bg-white/10 border border-white/20 rounded-full px-5 py-2 sm:px-4 sm:py-1.5 sm:mb-8 backdrop-blur-md">
                     <i data-lucide="mail" class="w-4 h-4 sm:w-3.5 sm:h-3.5 text-accent-light"></i>
                     <span class="text-sm sm:text-xs text-white/90 font-medium">Get In Touch</span>
                 </div>
             </div>
-            <div class="flex-1 flex items-center justify-center">
+            <div>
                 <h1 class="hero-anim hero-d2 font-brand font-bold tracking-tight text-white sm:mb-6" style="font-size: clamp(2.8rem, 9vw, 5rem); line-height: 1.05;">
                     Let's Build Something<br><span class="text-accent-light text-glow">Great Together</span>
                 </h1>
             </div>
-            <div class="pb-10 sm:pb-0">
+            <div class="mt-4 sm:mt-0">
                 <p class="hero-anim hero-d3 text-base sm:text-base sm:text-lg lg:text-xl font-light text-white/80 leading-relaxed max-w-2xl mx-auto sm:mb-10">
                     Have a project in mind? We'd love to hear about it. Reach out and let's discuss how we can transform your ideas into reality.
                 </p>
@@ -298,11 +309,11 @@
                                         <div class="text-xs sm:text-sm text-white font-medium">auradesigners0@gmail.com</div>
                                     </div>
                                 </a>
-                                <a href="https://wa.me/0717043283" target="_blank" rel="noopener noreferrer" class="flex items-center gap-3 sm:gap-4 group">
+                                <a href="https://wa.me/255717043283" target="_blank" rel="noopener noreferrer" class="flex items-center gap-3 sm:gap-4 group">
                                     <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-white/10 border border-white/20 flex items-center justify-center shrink-0 backdrop-blur-sm group-hover:bg-accent/30 transition-colors"><i data-lucide="message-circle" class="w-4 h-4 sm:w-5 sm:h-5 text-white"></i></div>
                                     <div>
                                         <div class="text-[0.65rem] sm:text-xs text-white/50 uppercase tracking-wider mb-0.5">WhatsApp</div>
-                                        <div class="text-xs sm:text-sm text-white font-medium">0717 043 283</div>
+                                        <div class="text-xs sm:text-sm text-white font-medium">+255 717 043 283</div>
                                     </div>
                                 </a>
                                 <div class="flex items-center gap-3 sm:gap-4">
@@ -347,14 +358,19 @@
                                         <div><label for="lastName" class="form-label">Last Name <span class="text-red-500">*</span></label><input type="text" id="lastName" name="last_name" class="form-input" placeholder="Last" required maxlength="50" autocomplete="family-name"><div class="form-error" id="lastNameError">Please enter your last name</div></div>
                                     </div>
                                     <div><label for="email" class="form-label">Email Address <span class="text-red-500">*</span></label><input type="email" id="email" name="email" class="form-input" placeholder="you@company.com" required maxlength="254" autocomplete="email"><div class="form-error" id="emailError">Please enter a valid email address</div></div>
-                                    <div><label for="phone" class="form-label">Phone Number <span class="text-gray-400 text-xs font-normal">(optional)</span></label><input type="tel" id="phone" name="phone" class="form-input" placeholder="0717 043 283" maxlength="20" autocomplete="tel"><div class="form-error" id="phoneError">Please enter a valid phone number</div></div>
+                                    <div><label for="phone" class="form-label">Phone Number <span class="text-gray-400 text-xs font-normal">(optional)</span></label><input type="tel" id="phone" name="phone" class="form-input" placeholder="+255 717 043 283" maxlength="20" autocomplete="tel"><div class="form-error" id="phoneError">Please enter a valid phone number</div></div>
                                     <div><label for="service" class="form-label">Service Interested In <span class="text-red-500">*</span></label><select id="service" name="service" class="form-input cursor-pointer" required style="appearance: none; background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%239CA3AF%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22m6%209%206%206%206-6%22%2F%3E%3C%2Fsvg%3E'); background-repeat: no-repeat; background-position: right 0.75rem center; background-size: 1rem;"><option value="" disabled selected style="color: #9CA3AF; background: #ffffff;">Select a service</option><option value="branding" style="background: #ffffff;">Digital Branding & Identity</option><option value="web" style="background: #ffffff;">Smart Web Solutions</option><option value="content" style="background: #ffffff;">Content Creation & Studio</option><option value="community" style="background: #ffffff;">Community Empowerment</option><option value="other" style="background: #ffffff;">Other</option></select><div class="form-error" id="serviceError">Please select a service</div></div>
                                     <div><label for="message" class="form-label">Project Details <span class="text-red-500">*</span></label><textarea id="message" name="message" class="form-input resize-none" rows="4" placeholder="Tell us about your project, goals, and timeline..." required maxlength="2000"></textarea><div class="flex items-center justify-between mt-1.5"><div class="form-error" id="messageError">Please describe your project (min 20 characters)</div><span class="text-xs text-gray-500 shrink-0 ml-4" id="charCount">0 / 2000</span></div></div>
                                     <div class="flex items-start gap-3"><input type="checkbox" id="consent" name="consent" class="mt-0.5 w-4 h-4 rounded border-gray-300 bg-white text-accent focus:ring-accent/30 focus:ring-offset-0 cursor-pointer" required><label for="consent" class="text-xs text-gray-600 leading-relaxed cursor-pointer">I agree to the <a href="#" class="text-accent hover:underline">Privacy Policy</a> and consent to AURATECH processing my data securely. <span class="text-red-500">*</span></label></div>
                                     <div class="form-error" id="consentError" style="margin-top: -0.25rem;">You must agree to the privacy policy</div>
+                                    <!-- Google reCAPTCHA v2 -->
+                                    <div class="recaptcha-wrapper">
+                                        <div class="g-recaptcha" data-sitekey="6LcMld0sAAAAAAPf2wlSdIx4ketTLHhcSwqLvMcd" data-theme="light" data-size="normal" id="recaptchaWidget"></div>
+                                    </div>
+                                    <div class="form-error" id="recaptchaError">Please verify that you are not a robot</div>
                                     <div id="rateLimitNotice" class="hidden bg-red-50 border border-red-200 rounded-lg p-3 flex items-center gap-2"><i data-lucide="alert-triangle" class="w-4 h-4 text-red-500 shrink-0"></i><span class="text-xs text-red-600">Too many attempts. Please wait before submitting again.</span></div>
                                     <button type="submit" id="submitBtn" class="w-full flex items-center justify-center gap-2.5 bg-accent hover:bg-accent-hover text-white font-medium px-8 py-4 rounded-xl transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] accent-glow text-sm disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"><span id="submitText">Send Secure Message</span><i data-lucide="send" class="w-4 h-4" id="submitIcon"></i><svg id="submitSpinner" class="hidden w-4 h-4 spin-slow" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3" stroke-linecap="round" class="opacity-25"></circle><path d="M4 12a8 8 0 018-8" stroke="currentColor" stroke-width="3" stroke-linecap="round" class="opacity-75"></path></svg></button>
-                                    <div class="flex items-center justify-center gap-4 pt-2"><div class="security-badge"><svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>AES-256</div><div class="security-badge"><i data-lucide="timer" class="w-3 h-3 text-accent"></i><span id="formTimer">Token expires in 30:00</span></div></div>
+                                    <div class="flex items-center justify-center gap-3 pt-2 flex-wrap"><div class="security-badge"><svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>AES-256</div><div class="security-badge"><i data-lucide="shield-check" class="w-3 h-3 text-accent"></i>reCAPTCHA</div><div class="security-badge"><i data-lucide="timer" class="w-3 h-3 text-accent"></i><span id="formTimer">Token expires in 30:00</span></div></div>
                                 </div>
                             </form>
                         </div>
@@ -375,7 +391,7 @@
                 <h2 class="reveal stagger-1 font-brand text-3xl md:text-4xl font-bold tracking-tight text-gray-900">Prefer a direct <span class="text-accent">channel?</span></h2>
             </div>
             <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                <a href="https://wa.me/0717043283" target="_blank" rel="noopener noreferrer" class="glass-card rounded-2xl p-6 group cursor-pointer reveal stagger-1 hover:shadow-lg transition-all duration-300 h-full block">
+                <a href="https://wa.me/255717043283" target="_blank" rel="noopener noreferrer" class="glass-card rounded-2xl p-6 group cursor-pointer reveal stagger-1 hover:shadow-lg transition-all duration-300 h-full block">
                     <div class="w-12 h-12 rounded-xl bg-[#25D366]/10 border border-[#25D366]/20 flex items-center justify-center mb-4"><svg class="w-5 h-5 text-accent" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg></div>
                     <h3 class="text-lg font-brand font-semibold text-gray-900 mb-2">Chat on WhatsApp</h3>
                     <p class="text-sm text-gray-600 leading-relaxed">Quick questions? Get instant replies during business hours.</p>
@@ -475,9 +491,9 @@
                     <a href="index.html" class="flex items-center gap-3 mb-4"><img src="image/logo.png" alt="AURATECH Logo" class="h-10 w-auto"></a>
                     <p class="text-sm text-gray-600 leading-relaxed max-w-xs mb-6">Innovating design. Empowering growth. Since 2023.</p>
                     <div class="flex items-center gap-3">
-                        <a href="https://wa.me/0717043283" target="_blank" rel="noopener noreferrer" class="w-10 h-10 rounded-xl bg-gray-100 border border-gray-200 flex items-center justify-center hover:bg-[#25D366]/10 hover:border-[#25D366]/20 transition-all duration-200 group" aria-label="WhatsApp"><svg class="w-[18px] h-[18px] text-gray-500 group-hover:text-[#25D366] transition-colors" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg></a>
+                        <a href="https://wa.me/255717043283" target="_blank" rel="noopener noreferrer" class="w-10 h-10 rounded-xl bg-gray-100 border border-gray-200 flex items-center justify-center hover:bg-[#25D366]/10 hover:border-[#25D366]/20 transition-all duration-200 group" aria-label="WhatsApp"><svg class="w-[18px] h-[18px] text-gray-500 group-hover:text-[#25D366] transition-colors" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg></a>
                         <a href="https://www.instagram.com/aurawebdesigners?igsh=a2s2OHZxMnFkN2Y4" target="_blank" rel="noopener noreferrer" class="w-10 h-10 rounded-xl bg-gray-100 border border-gray-200 flex items-center justify-center hover:bg-[#E4405F]/10 hover:border-[#E4405F]/20 transition-all duration-200 group" aria-label="Instagram"><svg class="w-[18px] h-[18px] text-gray-500 group-hover:text-[#E4405F] transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg></a>
-                        <a href="https://linkedin.com/company/auratech" target="_blank" rel="noopener noreferrer" class="w-10 h-10 rounded-xl bg-gray-100 border border-gray-200 flex items-center justify-center hover:bg-[#0A66C2]/10 hover:border-[#0A66C2]/20 transition-all duration-200 group" aria-label="LinkedIn"><svg class="w-[18px] h-[18px] text-gray-500 group-hover:text-[#0A66C2] transition-colors" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg></a>
+                        <a href="https://tz.linkedin.com/in/aura-designers-216097387" target="_blank" rel="noopener noreferrer" class="w-10 h-10 rounded-xl bg-gray-100 border border-gray-200 flex items-center justify-center hover:bg-[#0A66C2]/10 hover:border-[#0A66C2]/20 transition-all duration-200 group" aria-label="LinkedIn"><svg class="w-[18px] h-[18px] text-gray-500 group-hover:text-[#0A66C2] transition-colors" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg></a>
                     </div>
                 </div>
                 <div class="reveal-top stagger-1"><h4 class="text-sm font-medium text-gray-900 mb-4">Services</h4><ul class="space-y-3"><li><a href="service.html#branding" class="text-sm text-gray-600 hover:text-gray-900 transition-colors">Digital Branding</a></li><li><a href="service.html#web" class="text-sm text-gray-600 hover:text-gray-900 transition-colors">Web Solutions</a></li><li><a href="service.html#content" class="text-sm text-gray-600 hover:text-gray-900 transition-colors">Content Creation</a></li><li><a href="service.html#community" class="text-sm text-gray-600 hover:text-gray-900 transition-colors">Community</a></li></ul></div>
@@ -655,6 +671,10 @@
             if (ph) v = validateField('phone', /^[\+]?[\d\s\-\(\)]{7,20}$/.test(ph)) & v;
             v = validateField('service', sv !== '') & v; v = validateField('message', ms.length >= 20) & v;
             const ce = document.getElementById('consentError'); if (!co) { ce.classList.add('visible'); v = false; } else ce.classList.remove('visible');
+            // reCAPTCHA v2 validation
+            const recaptchaResponse = typeof grecaptcha !== 'undefined' ? grecaptcha.getResponse() : '';
+            const re = document.getElementById('recaptchaError');
+            if (!recaptchaResponse) { re.classList.add('visible'); v = false; } else { re.classList.remove('visible'); }
             if (!v) { showToast('error','Validation Error','Please fix highlighted fields.'); const fe = document.querySelector('.form-input.error'); if (fe) fe.focus(); return; }
             attemptTimestamps.push(Date.now());
             const btn = document.getElementById('submitBtn'), txt = document.getElementById('submitText'), ico = document.getElementById('submitIcon'), spn = document.getElementById('submitSpinner');
@@ -675,28 +695,46 @@
                 phone: ph || 'Not provided',
                 service: sv,
                 message: ms,
-                consent: co ? 'Yes' : 'No'
+                consent: co ? 'Yes' : 'No',
+                'g-recaptcha-response': recaptchaResponse
             };
 
-            // Send 1: Notification email to you
+            // Helper: reset form UI to ready state
+            function resetFormUI() {
+                btn.disabled = false; txt.textContent = 'Send Secure Message'; ico.classList.remove('hidden'); spn.classList.add('hidden');
+                document.getElementById('csrfToken').value = generateCSRF(); document.getElementById('contactForm').reset();
+                document.querySelectorAll('.form-input').forEach(i => i.classList.remove('success','error')); document.querySelectorAll('.form-error').forEach(e => e.classList.remove('visible'));
+                charCount.textContent = '0 / 2000'; charCount.classList.remove('text-red-500'); charCount.classList.add('text-gray-500');
+                document.getElementById('consentError').classList.remove('visible');
+                if (typeof grecaptcha !== 'undefined') { grecaptcha.reset(); }
+            }
+
+            // Send 1: Notification email to you (PRIMARY — this is the important one)
             emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_NOTIFY, templateParams, EMAILJS_PUBLIC_KEY)
                 .then(function() {
-                    // Notification sent — now send auto-reply to customer
-                    return emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_AUTOREPLY, templateParams, EMAILJS_PUBLIC_KEY);
-                })
-                .then(function() {
-                    // Both emails sent successfully
-                    btn.disabled = false; txt.textContent = 'Send Secure Message'; ico.classList.remove('hidden'); spn.classList.add('hidden');
-                    document.getElementById('csrfToken').value = generateCSRF(); document.getElementById('contactForm').reset();
-                    document.querySelectorAll('.form-input').forEach(i => i.classList.remove('success','error')); document.querySelectorAll('.form-error').forEach(e => e.classList.remove('visible'));
-                    charCount.textContent = '0 / 2000'; charCount.classList.remove('text-red-500'); charCount.classList.add('text-gray-500');
-                    document.getElementById('consentError').classList.remove('visible');
-                    showToast('success','Message Sent Successfully','Your inquiry has been received. Check your email for confirmation!');
+                    // Notification sent successfully — show success immediately
+                    resetFormUI();
+                    showToast('success','Message Sent Successfully','Your inquiry has been received. We\'ll respond within 24 hours!');
+
+                    // Send 2: Auto-reply to customer after 7-second delay (feels more natural)
+                    // Random delay between 5-10 seconds so it doesn't look robotic
+                    var autoReplyDelay = 5000 + Math.floor(Math.random() * 5000); // 5–10 seconds
+                    setTimeout(function() {
+                        emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_AUTOREPLY, templateParams, EMAILJS_PUBLIC_KEY)
+                            .then(function() {
+                                console.log('Auto-reply sent to customer after ' + Math.round(autoReplyDelay/1000) + 's delay');
+                            })
+                            .catch(function(autoReplyError) {
+                                // Auto-reply failed silently — notification already succeeded
+                                console.warn('Auto-reply could not be sent:', autoReplyError?.text || autoReplyError);
+                            });
+                    }, autoReplyDelay);
                 })
                 .catch(function(error) {
-                    // Error (either notification or auto-reply failed)
+                    // Notification email itself failed — this is a real error
                     btn.disabled = false; txt.textContent = 'Send Secure Message'; ico.classList.remove('hidden'); spn.classList.add('hidden');
-                    console.error('EmailJS Error:', error);
+                    if (typeof grecaptcha !== 'undefined') { grecaptcha.reset(); }
+                    console.error('EmailJS Notification Error:', error);
                     showToast('error','Sending Failed','Something went wrong. Please try again or email us directly at auradesigners0@gmail.com');
                 });
         });
