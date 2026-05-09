@@ -687,7 +687,23 @@
             const EMAILJS_PUBLIC_KEY   = 'h2bxvU7nIshl_AEFm';
 
             // Map form fields to EmailJS template variables
-            const templateParams = {
+            // Notification params — do NOT include 'email' as a recipient field to avoid
+            // the notification template also sending to the customer (causing duplicate emails).
+            // Customer email is passed as 'customer_email' for display in the notification body only.
+            const notifyParams = {
+                from_name: fn + ' ' + ln,
+                first_name: fn,
+                last_name: ln,
+                customer_email: em,
+                phone: ph || 'Not provided',
+                service: sv,
+                message: ms,
+                consent: co ? 'Yes' : 'No',
+                'g-recaptcha-response': recaptchaResponse
+            };
+
+            // Auto-reply params — 'email' field is used by the auto-reply template to send TO the customer
+            const autoReplyParams = {
                 from_name: fn + ' ' + ln,
                 first_name: fn,
                 last_name: ln,
@@ -710,25 +726,23 @@
             }
 
             // Send 1: Notification email to you (PRIMARY — this is the important one)
-            emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_NOTIFY, templateParams, EMAILJS_PUBLIC_KEY)
+            emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_NOTIFY, notifyParams, EMAILJS_PUBLIC_KEY)
                 .then(function() {
                     // Notification sent successfully — show success immediately
                     resetFormUI();
                     showToast('success','Message Sent Successfully','Your inquiry has been received. We\'ll respond within 24 hours!');
 
-                    // Send 2: Auto-reply to customer after 7-second delay (feels more natural)
-                    // Random delay between 5-10 seconds so it doesn't look robotic
-                    var autoReplyDelay = 5000 + Math.floor(Math.random() * 5000); // 5–10 seconds
+                    // Send 2: Auto-reply to customer after 20-second delay
                     setTimeout(function() {
-                        emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_AUTOREPLY, templateParams, EMAILJS_PUBLIC_KEY)
+                        emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_AUTOREPLY, autoReplyParams, EMAILJS_PUBLIC_KEY)
                             .then(function() {
-                                console.log('Auto-reply sent to customer after ' + Math.round(autoReplyDelay/1000) + 's delay');
+                                console.log('Auto-reply sent to customer after 20s delay');
                             })
                             .catch(function(autoReplyError) {
                                 // Auto-reply failed silently — notification already succeeded
                                 console.warn('Auto-reply could not be sent:', autoReplyError?.text || autoReplyError);
                             });
-                    }, autoReplyDelay);
+                    }, 20000);
                 })
                 .catch(function(error) {
                     // Notification email itself failed — this is a real error
