@@ -11,13 +11,16 @@ datasource db {
 }
 
 model User {
-  id        String   @id @default(cuid())
-  email     String   @unique
-  name      String?
-  password  String
-  role      String   @default("USER") // "USER" | "ADMIN"
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id         String   @id @default(cuid())
+  email      String   @unique
+  name       String?
+  password   String
+  role       String   @default("USER") // "USER" | "ADMIN"
+  // 2FA fields
+  totpSecret String?  // TOTP secret for Google Authenticator
+  totpEnabled Boolean @default(false) // whether 2FA is enabled
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 }
 
 model Post {
@@ -38,7 +41,26 @@ model ContactSubmission {
   budget      String?
   message     String?
   source      String   @default("contact-form")
+  // Project inquiry workflow
+  status      String   @default("new") // "new" | "reviewed" | "quoted" | "won" | "lost"
+  quoteAmount String?  // optional quote amount (e.g. "TZS 950,000")
+  notes       String?  // internal admin notes
   createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([status, createdAt])
+}
+
+// === Rate limiting — tracks failed login attempts by IP ===
+model LoginAttempt {
+  id        String   @id @default(cuid())
+  ip        String
+  email     String?
+  success   Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([ip, createdAt])
+  @@index([email, createdAt])
 }
 
 // === Admin-managed portfolio projects ===
@@ -49,16 +71,16 @@ model Project {
   category    String
   description String   // short teaser shown on the card
   tag         String   @default("Web")
-  accent      String   @default("from-[#1B4332] to-[#143A2B]") // tailwind gradient classes
+  accent      String   @default("from-[#1B4332] to-[#143A2B]")
   brief       String   @default("")
   challenges  String   @default("")
   solution    String   @default("")
   results     String   @default("")
-  thumbnail   String?  // optional image URL
-  previewUrl  String?  // optional link to the live project (e.g. https://abcchurch.com)
+  thumbnail   String?
+  previewUrl  String?
   featured    Boolean  @default(false)
   published   Boolean  @default(true)
-  order       Int      @default(0) // manual ordering; lower = first
+  order       Int      @default(0)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
@@ -71,11 +93,11 @@ model BlogPost {
   slug      String   @unique
   title     String
   excerpt   String   @default("")
-  content   String   @default("") // markdown body
+  content   String   @default("")
   category  String   @default("Insights")
-  date      String   // display date e.g. "Aug 2026"
+  date      String
   readTime  String   @default("5 min read")
-  coverImage String? // optional cover image URL
+  coverImage String?
   published Boolean  @default(true)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -83,12 +105,12 @@ model BlogPost {
   @@index([published, createdAt])
 }
 
-// === Admin-managed client logos (the "Trusted By" strip on the homepage) ===
+// === Admin-managed client logos ===
 model Client {
   id        String   @id @default(cuid())
   name      String
-  logoData  String   // base64 data URL — works on any host, no external storage needed
-  order     Int      @default(0) // manual ordering; lower = first
+  logoData  String
+  order     Int      @default(0)
   published Boolean  @default(true)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -96,14 +118,14 @@ model Client {
   @@index([published, order])
 }
 
-// === Admin-managed testimonials (shown on the homepage) ===
+// === Admin-managed testimonials ===
 model Testimonial {
   id        String   @id @default(cuid())
   quote     String
   author    String
   role      String   @default("")
   company   String   @default("")
-  photoData String?  // base64 data URL of the person's photo (optional)
+  photoData String?
   order     Int      @default(0)
   published Boolean  @default(true)
   createdAt DateTime @default(now())

@@ -25,6 +25,9 @@ export async function GET() {
       projectType: s.projectType,
       budget: s.budget,
       message: s.message,
+      status: s.status || "new",
+      quoteAmount: s.quoteAmount,
+      notes: s.notes,
       createdAt: s.createdAt.toISOString(),
     })),
   });

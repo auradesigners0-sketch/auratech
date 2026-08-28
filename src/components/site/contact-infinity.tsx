@@ -64,24 +64,24 @@ export function ContactInfinity() {
   return (
     <section
       id="contact"
-      className="relative w-full overflow-hidden bg-[#1B4332] py-20 pb-28 sm:py-24 sm:pb-32 lg:py-28"
+      className="relative w-full overflow-hidden bg-background py-20 pb-28 sm:py-24 sm:pb-32 lg:py-28"
     >
       {/* === Full-width background decorations === */}
       {/* Subtle grid texture */}
-      <div className="pointer-events-none absolute inset-0 bg-grid-green opacity-30" aria-hidden="true" />
+      <div className="pointer-events-none absolute inset-0 bg-grid-dark opacity-40" aria-hidden="true" />
       {/* Lime glow orb — top-left */}
       <div
-        className="pointer-events-none absolute -left-32 -top-32 h-96 w-96 rounded-full bg-accent/15 blur-3xl"
+        className="pointer-events-none absolute -left-32 -top-32 h-96 w-96 rounded-full bg-accent/10 blur-3xl"
         aria-hidden="true"
       />
       {/* Lime glow orb — bottom-right */}
       <div
-        className="pointer-events-none absolute -bottom-32 -right-32 h-96 w-96 rounded-full bg-accent/10 blur-3xl"
+        className="pointer-events-none absolute -bottom-32 -right-32 h-96 w-96 rounded-full bg-primary/8 blur-3xl"
         aria-hidden="true"
       />
       {/* Oversized decorative numeral */}
       <div
-        className="pointer-events-none absolute -right-8 top-12 hidden select-none font-display text-[16rem] font-extrabold leading-none text-white/[0.04] xl:block"
+        className="pointer-events-none absolute -right-8 top-12 hidden select-none font-display text-[16rem] font-extrabold leading-none text-primary/[0.05] xl:block"
         aria-hidden="true"
       >
         04
@@ -91,21 +91,21 @@ export function ContactInfinity() {
       <div className="editorial relative z-10">
         {/* Header strip */}
         <div data-reveal className="mb-12 flex items-center gap-4">
-          <span className="h-px w-12 bg-accent" />
-          <p className="kicker text-accent">Get in touch</p>
+          <span className="h-px w-12 bg-primary" />
+          <p className="kicker text-primary">Get in touch</p>
         </div>
 
         {/* === 2-column layout === */}
         <div className="grid gap-10 lg:grid-cols-[1.3fr_1fr] lg:gap-12">
           {/* === LEFT: headline + form panel === */}
           <div data-reveal>
-            <h2 className="font-display text-4xl font-extrabold leading-[1.05] tracking-tight text-white sm:text-5xl lg:text-[3.5rem]">
+            <h2 className="font-display text-4xl font-extrabold leading-[1.05] tracking-tight text-primary sm:text-5xl lg:text-[3.5rem]">
               Let&apos;s build
               <br />
               something <span className="text-accent">remarkable</span>.
             </h2>
 
-            <p className="serif-italic mt-5 max-w-md text-base leading-relaxed text-white/70 sm:text-lg">
+            <p className="serif-italic mt-5 max-w-md text-base leading-relaxed text-foreground/70 sm:text-lg">
               Have a project in mind? Tell us about it — we typically reply
               within one business day.
             </p>
@@ -117,10 +117,10 @@ export function ContactInfinity() {
               <div className="grid gap-7 sm:grid-cols-2">
                 <div>
                   <label htmlFor="name" className="mb-3 block">
-                    <span className="kicker text-white/60">Your name</span>
-                    <span className="ml-2 text-[10px] text-white/40">(optional)</span>
+                    <span className="kicker text-foreground/60">Your name</span>
+                    <span className="ml-2 text-[10px] text-foreground/40">(optional)</span>
                   </label>
-                  <div className="flex items-center border-b-2 border-white/20 transition-colors focus-within:border-accent">
+                  <div className="flex items-center border-b-2 border-border transition-colors focus-within:border-primary">
                     <input
                       id="name"
                       type="text"
@@ -128,17 +128,17 @@ export function ContactInfinity() {
                       onChange={(e) => setName(e.target.value)}
                       placeholder="Jane Doe"
                       disabled={status === "loading"}
-                      className="flex-1 bg-transparent py-3 text-base text-white placeholder:text-white/40 focus:outline-none disabled:opacity-50"
+                      className="flex-1 bg-transparent py-3 text-base text-foreground placeholder:text-foreground/40 focus:outline-none disabled:opacity-50"
                     />
                   </div>
                 </div>
 
                 <div>
                   <label htmlFor="email" className="mb-3 block">
-                    <span className="kicker text-white/60">Your email</span>
-                    <span className="ml-2 text-[10px] text-accent">*</span>
+                    <span className="kicker text-foreground/60">Your email</span>
+                    <span className="ml-2 text-[10px] text-primary">*</span>
                   </label>
-                  <div className="flex items-center border-b-2 border-white/20 transition-colors focus-within:border-accent">
+                  <div className="flex items-center border-b-2 border-border transition-colors focus-within:border-primary">
                     <input
                       id="email"
                       type="email"
@@ -147,7 +147,7 @@ export function ContactInfinity() {
                       onChange={(e) => setEmail(e.target.value)}
                       placeholder="you@company.com"
                       disabled={status === "loading"}
-                      className="flex-1 bg-transparent py-3 text-base text-white placeholder:text-white/40 focus:outline-none disabled:opacity-50"
+                      className="flex-1 bg-transparent py-3 text-base text-foreground placeholder:text-foreground/40 focus:outline-none disabled:opacity-50"
                     />
                   </div>
                 </div>
@@ -178,10 +178,10 @@ export function ContactInfinity() {
               {/* Message */}
               <div>
                 <label htmlFor="message" className="mb-3 block">
-                  <span className="kicker text-white/60">Tell us about your project</span>
-                  <span className="ml-2 text-[10px] text-white/40">(optional)</span>
+                  <span className="kicker text-foreground/60">Tell us about your project</span>
+                  <span className="ml-2 text-[10px] text-foreground/40">(optional)</span>
                 </label>
-                <div className="border-b-2 border-white/20 transition-colors focus-within:border-accent">
+                <div className="border-b-2 border-border transition-colors focus-within:border-primary">
                   <textarea
                     id="message"
                     rows={3}
@@ -189,7 +189,7 @@ export function ContactInfinity() {
                     onChange={(e) => setMessage(e.target.value)}
                     placeholder="What are you building? What problem are you trying to solve?"
                     disabled={status === "loading"}
-                    className="w-full resize-none bg-transparent py-3 text-base text-white placeholder:text-white/40 focus:outline-none disabled:opacity-50"
+                    className="w-full resize-none bg-transparent py-3 text-base text-foreground placeholder:text-foreground/40 focus:outline-none disabled:opacity-50"
                   />
                 </div>
               </div>
@@ -215,7 +215,7 @@ export function ContactInfinity() {
                 </button>
 
                 {status === "idle" && (
-                  <p className="text-xs text-white/40">
+                  <p className="text-xs text-foreground/40">
                     We respect your inbox. No spam, ever.
                   </p>
                 )}
@@ -247,7 +247,7 @@ export function ContactInfinity() {
             </div>
 
             {/* Contact info list */}
-            <ul className="divide-y divide-white/10 border-t border-white/10">
+            <ul className="divide-y divide-border border-t border-border">
               <ContactItem
                 icon={Mail}
                 label="Email"
@@ -285,7 +285,7 @@ export function ContactInfinity() {
                 </span>
                 <div>
                   <p className="kicker text-accent">Prefer to chat?</p>
-                  <p className="font-display text-base font-semibold text-white">
+                  <p className="font-display text-base font-semibold text-foreground">
                     Message us on WhatsApp
                   </p>
                 </div>
@@ -321,29 +321,29 @@ function SelectField({
   return (
     <div>
       <label htmlFor={id} className="mb-3 block">
-        <span className="kicker text-white/60">{label}</span>
+        <span className="kicker text-foreground/60">{label}</span>
       </label>
-      <div className="relative flex items-center border-b-2 border-white/20 transition-colors focus-within:border-accent">
+      <div className="relative flex items-center border-b-2 border-border transition-colors focus-within:border-primary">
         <select
           id={id}
           value={value}
           onChange={(e) => onChange(e.target.value)}
           disabled={disabled}
           className={`flex-1 appearance-none bg-transparent py-3 pr-8 text-base focus:outline-none disabled:opacity-50 ${
-            value ? "text-white" : "text-white/40"
+            value ? "text-foreground" : "text-foreground/40"
           }`}
         >
           <option value="" disabled>
             {placeholder}
           </option>
           {options.map((opt) => (
-            <option key={opt} value={opt} className="bg-[#143A2B] text-white">
+            <option key={opt} value={opt} className="bg-secondary text-foreground">
               {opt}
             </option>
           ))}
         </select>
         <ChevronDown
-          className="pointer-events-none absolute right-0 h-4 w-4 text-white/40"
+          className="pointer-events-none absolute right-0 h-4 w-4 text-foreground/40"
           aria-hidden="true"
         />
       </div>
@@ -369,8 +369,8 @@ function ContactItem({
         <Icon className="h-4 w-4" />
       </div>
       <div>
-        <p className="kicker mb-1 text-white/50">{label}</p>
-        <p className="font-display text-base font-semibold text-white sm:text-lg">
+        <p className="kicker mb-1 text-foreground/50">{label}</p>
+        <p className="font-display text-base font-semibold text-foreground sm:text-lg">
           {value}
         </p>
       </div>
