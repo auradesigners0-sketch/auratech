@@ -1,0 +1,113 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  password  String
+  role      String   @default("USER") // "USER" | "ADMIN"
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Post {
+  id        String   @id @default(cuid())
+  title     String
+  content   String?
+  published Boolean  @default(false)
+  authorId  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model ContactSubmission {
+  id          String   @id @default(cuid())
+  name        String?
+  email       String
+  projectType String?
+  budget      String?
+  message     String?
+  source      String   @default("contact-form")
+  createdAt   DateTime @default(now())
+}
+
+// === Admin-managed portfolio projects ===
+model Project {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  title       String
+  category    String
+  description String   // short teaser shown on the card
+  tag         String   @default("Web")
+  accent      String   @default("from-[#1B4332] to-[#143A2B]") // tailwind gradient classes
+  brief       String   @default("")
+  challenges  String   @default("")
+  solution    String   @default("")
+  results     String   @default("")
+  thumbnail   String?  // optional image URL
+  previewUrl  String?  // optional link to the live project (e.g. https://abcchurch.com)
+  featured    Boolean  @default(false)
+  published   Boolean  @default(true)
+  order       Int      @default(0) // manual ordering; lower = first
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([published, order])
+}
+
+// === Admin-managed blog posts ===
+model BlogPost {
+  id        String   @id @default(cuid())
+  slug      String   @unique
+  title     String
+  excerpt   String   @default("")
+  content   String   @default("") // markdown body
+  category  String   @default("Insights")
+  date      String   // display date e.g. "Aug 2026"
+  readTime  String   @default("5 min read")
+  coverImage String? // optional cover image URL
+  published Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([published, createdAt])
+}
+
+// === Admin-managed client logos (the "Trusted By" strip on the homepage) ===
+model Client {
+  id        String   @id @default(cuid())
+  name      String
+  logoData  String   // base64 data URL — works on any host, no external storage needed
+  order     Int      @default(0) // manual ordering; lower = first
+  published Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([published, order])
+}
+
+// === Admin-managed testimonials (shown on the homepage) ===
+model Testimonial {
+  id        String   @id @default(cuid())
+  quote     String
+  author    String
+  role      String   @default("")
+  company   String   @default("")
+  photoData String?  // base64 data URL of the person's photo (optional)
+  order     Int      @default(0)
+  published Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([published, order])
+}
