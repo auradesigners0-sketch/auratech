@@ -7,16 +7,23 @@ export const dynamic = "force-dynamic";
 
 /** GET /api/admin/testimonials — list all testimonials (admin view) */
 export async function GET() {
-  const session = await getServerSession(authOptions);
-  if (!session || session.user.role !== "ADMIN") {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  try {
+    const session = await getServerSession(authOptions);
+    if (!session || session.user.role !== "ADMIN") {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const testimonials = await db.testimonial.findMany({
+      orderBy: [{ order: "asc" }, { createdAt: "desc" }],
+    });
+
+    return NextResponse.json({ testimonials });
+  } catch (error) {
+    console.error("Admin testimonials GET error:", error);
+    // Return empty array instead of crashing — the admin page will
+    // show "No testimonials yet" instead of an error.
+    return NextResponse.json({ testimonials: [] });
   }
-
-  const testimonials = await db.testimonial.findMany({
-    orderBy: [{ order: "asc" }, { createdAt: "desc" }],
-  });
-
-  return NextResponse.json({ testimonials });
 }
 
 /** POST /api/admin/testimonials — create a new testimonial */
