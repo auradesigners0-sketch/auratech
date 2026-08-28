@@ -14,12 +14,12 @@ export const dynamic = "force-dynamic";
  * Body: { secret, code }
  */
 export async function POST(req: Request) {
-  const session = await getServerSession(authOptions);
-  if (!session || session.user.role !== "ADMIN") {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
   try {
+    const session = await getServerSession(authOptions);
+    if (!session || session.user.role !== "ADMIN") {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const body = await req.json();
     const { secret, code } = body;
 
@@ -59,7 +59,7 @@ export async function POST(req: Request) {
   } catch (err) {
     console.error("2FA verify failed:", err);
     return NextResponse.json(
-      { error: "Failed to verify 2FA code." },
+      { error: `Failed to verify 2FA code: ${err instanceof Error ? err.message : "Unknown error"}` },
       { status: 500 }
     );
   }
